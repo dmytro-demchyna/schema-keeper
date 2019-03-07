@@ -1,0 +1,48 @@
+{
+  "name": "schema-keeper/schema-keeper",
+  "description": "Library for simplify development and deploy of PHP projects, which uses PostgreSQL database",
+  "minimum-stability": "stable",
+  "type": "library",
+  "license": "MIT",
+  "keywords": [
+    "database",
+    "db",
+    "postgresql",
+    "postgres",
+    "plpgsql",
+    "PL/pgSQL",
+    "schema",
+    "dump",
+    "sync",
+    "synchronization",
+    "deploy"
+  ],
+  "authors": [
+    {
+      "name": "Dmytro Demchyna",
+      "email": "dmitry.demchina@gmail.com",
+      "role": "Developer"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "SchemaKeeper\\": "src/SchemaKeeper"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "SchemaKeeper\\Tests\\": "tests/SchemaKeeper"
+    },
+    "classmap": ["tests/helpers"]
+  },
+  "require": {
+    "php": ">=5.6",
+    "ext-pdo": "*",
+    "ext-pdo_pgsql": "*",
+    "ext-json": "*"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^5.0||^6.0",
+    "mockery/mockery": "^1.0"
+  }
+}
