@@ -1,4 +1,9 @@
 <?php
+/**
+ * This file is part of the SchemaKeeper package.
+ * (c) Dmytro Demchyna <dmitry.demchina@gmail.com>
+ * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
+ */
 
 namespace SchemaKeeper\Tests\Core;
 
@@ -44,8 +49,8 @@ class TestEntryPointTest extends SchemaTestCase
         exec('rm -r /tmp/schema_keeper/structure/public/triggers');
 
         $expected = [
-            'left' => [],
-            'right' => [
+            'expected' => [],
+            'actual' => [
                 'triggers' => [
                     'public.test_table.test_trigger' => 'CREATE TRIGGER test_trigger BEFORE UPDATE ON test_table FOR EACH ROW EXECUTE PROCEDURE trig_test()',
                 ],

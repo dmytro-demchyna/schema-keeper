@@ -1,4 +1,9 @@
 <?php
+/**
+ * This file is part of the SchemaKeeper package.
+ * (c) Dmytro Demchyna <dmitry.demchina@gmail.com>
+ * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
+ */
 
 namespace SchemaKeeper\Core;
 
@@ -126,8 +131,8 @@ class SyncEntryPoint
         $comparisonResult = $this->comparator->compareSection('functions', $expectedFunctions, $actualFunctions);
 
         return [
-            'expected' => $comparisonResult['left'],
-            'actual' => $comparisonResult['right'],
+            'expected' => $comparisonResult['expected'],
+            'actual' => $comparisonResult['actual'],
             'deleted' => $functionNamesToDelete,
             'created' => $functionNamesToCreate,
             'changed' => array_keys($functionsToChange),

@@ -1,4 +1,9 @@
 <?php
+/**
+ * This file is part of the SchemaKeeper package.
+ * (c) Dmytro Demchyna <dmitry.demchina@gmail.com>
+ * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
+ */
 
 namespace SchemaKeeper;
 
@@ -10,8 +15,8 @@ use SchemaKeeper\Core\TestEntryPoint;
 use SchemaKeeper\Provider\PostgreSQL\PSQLParameters;
 
 /**
- * @package SchemaKeeper
  * @api
+ * @author Dmytro Demchyna <dmitry.demchina@gmail.com>
  */
 class Keeper
 {
@@ -48,7 +53,7 @@ class Keeper
 
     /**
      * Make structure dump from current database and save it in filesystem
-     * @param string $destinationPath
+     * @param string $destinationPath Dump will be saved in this folder
      * @throws Exception
      */
     public function writeDump($destinationPath)
@@ -57,8 +62,11 @@ class Keeper
     }
 
     /**
-     * Compare current dump with dump previously saved in filesystem
-     * @param string $dumpPath
+     * Compare current dump with dump previously saved in filesystem.
+     * Function returns array with keys: 'expected', 'actual'.
+     * If 'expected' != 'actual' - the current database structure is different from the saved one.
+     *
+     * @param string $dumpPath Path to previously saved dump
      * @return array
      * @throws Exception
      */
@@ -68,8 +76,13 @@ class Keeper
     }
 
     /**
-     * Deploy functions from dump previously saved in filesystem
-     * @param $dumpPath
+     * Deploy functions from dump previously saved in filesystem.
+     * Function returns array with keys: 'expected', 'actual', 'deleted', 'created', 'changed'
+     * If 'expected' != 'actual' - there is a problem with the files containing the source code of the stored procedures
+     * 'deleted' - list of functions that were deleted from the current database, as they do not exist in the saved dump
+     * 'created' - list of functions that were created in the current database, as they do not exist in the saved dump
+     * 'changed' - list of functions that were changed in the current database, as their source code is different between saved dump and current database
+     * @param string $dumpPath Path to previously saved dump
      * @return array
      * @throws Exception
      */

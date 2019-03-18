@@ -1,4 +1,9 @@
 <?php
+/**
+ * This file is part of the SchemaKeeper package.
+ * (c) Dmytro Demchyna <dmitry.demchina@gmail.com>
+ * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
+ */
 
 namespace SchemaKeeper\Tests\Core;
 
@@ -51,21 +56,21 @@ class DumpComparatorTest extends SchemaTestCase
         ])->once();
 
         $this->sectionComparator->shouldReceive('compareSection')->with('tables', ['table1'], ['table2'])->andReturn([
-            'left' => 'left1',
-            'right' => 'right1',
+            'expected' => 'left1',
+            'actual' => 'right1',
         ])->once();
 
         $this->sectionComparator->shouldReceive('compareSection')->with('functions', ['function1'], ['function2'])->andReturn([
-            'left' => 'left2',
-            'right' => 'right2',
+            'expected' => 'left2',
+            'actual' => 'right2',
         ])->once();
 
         $expected = [
-            'left' => [
+            'expected' => [
                 'left1',
                 'left2',
             ],
-            'right' => [
+            'actual' => [
                 'right1',
                 'right2',
             ],

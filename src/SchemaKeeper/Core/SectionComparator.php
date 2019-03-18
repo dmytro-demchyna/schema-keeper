@@ -1,4 +1,9 @@
 <?php
+/**
+ * This file is part of the SchemaKeeper package.
+ * (c) Dmytro Demchyna <dmitry.demchina@gmail.com>
+ * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
+ */
 
 namespace SchemaKeeper\Core;
 
@@ -6,47 +11,47 @@ class SectionComparator
 {
     /**
      * @param string $sectionName
-     * @param array $leftSection
-     * @param array $rightSection
+     * @param array $expectedSection
+     * @param array $actualSection
      * @return array
      */
-    public function compareSection($sectionName, array $leftSection, array $rightSection)
+    public function compareSection($sectionName, array $expectedSection, array $actualSection)
     {
-        if ($leftSection === $rightSection) {
+        if ($expectedSection === $actualSection) {
             return [];
         }
 
-        $result = $this->doCompare($sectionName, $leftSection, $rightSection);
-        $resultInverted = $this->doCompare($sectionName, $rightSection, $leftSection);
+        $result = $this->doCompare($sectionName, $expectedSection, $actualSection);
+        $resultInverted = $this->doCompare($sectionName, $actualSection, $expectedSection);
 
-        $result['left'] = array_merge($result['left'], $resultInverted['right']);
-        $result['right'] = array_merge($result['right'], $resultInverted['left']);
+        $result['expected'] = array_merge($result['expected'], $resultInverted['actual']);
+        $result['actual'] = array_merge($result['actual'], $resultInverted['expected']);
 
         return $result;
     }
 
     /**
      * @param string $sectionName
-     * @param array $leftSection
-     * @param array $rightSection
+     * @param array $expectedSection
+     * @param array $actualSection
      * @return array
      */
-    private function doCompare($sectionName, array $leftSection, array $rightSection)
+    private function doCompare($sectionName, array $expectedSection, array $actualSection)
     {
         $result = [
-            'left' => [],
-            'right' => [],
+            'expected' => [],
+            'actual' => [],
         ];
 
-        foreach ($leftSection as $leftItemName => $leftItemContent) {
-            $rightItemContent = isset($rightSection[$leftItemName]) ? $rightSection[$leftItemName] : '';
-            if ($leftItemContent === $rightItemContent) {
+        foreach ($expectedSection as $expectedItemName => $expectedItemContent) {
+            $actualItemContent = isset($actualSection[$expectedItemName]) ? $actualSection[$expectedItemName] : '';
+            if ($expectedItemContent === $actualItemContent) {
                 continue;
             }
 
-            $result['left'][$sectionName][$leftItemName] = $leftSection[$leftItemName];
-            if ($rightItemContent) {
-                $result['right'][$sectionName][$leftItemName] = $rightItemContent;
+            $result['expected'][$sectionName][$expectedItemName] = $expectedSection[$expectedItemName];
+            if ($actualItemContent) {
+                $result['actual'][$sectionName][$expectedItemName] = $actualItemContent;
             }
         }
 
