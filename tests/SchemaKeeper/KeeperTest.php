@@ -29,7 +29,7 @@ class KeeperTest extends SchemaTestCase
 
     public function testOk()
     {
-        $this->target->writeDump('/tmp/schema_keeper');
+        $this->target->saveDump('/tmp/schema_keeper');
 
         $conn = $this->getConn();
         $conn->beginTransaction();

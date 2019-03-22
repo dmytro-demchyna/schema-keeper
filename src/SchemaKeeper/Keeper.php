@@ -56,7 +56,7 @@ class Keeper
      * @param string $destinationPath Dump will be saved in this folder
      * @throws Exception
      */
-    public function writeDump($destinationPath)
+    public function saveDump($destinationPath)
     {
         $this->dumpEntryPoint->execute($destinationPath);
     }

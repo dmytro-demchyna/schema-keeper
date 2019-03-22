@@ -30,12 +30,12 @@ The essence of the library's work is to write database structure to the file sys
 You can edit files, that contain stored procedures source code, via any text editor, commit changes to a version control system and call `deployDump` to deploy changes into the database.
 
 **SchemaKeeper**  provides 3 functions:
-* `$keeper->writeDump('path_to_dump')`
+* `$keeper->saveDump('path_to_dump')`
 * `$keeper->verifyDump('path_to_dump')`
 * `$keeper->deployDump('path_to_dump')`
 
-### writeDump
-`writeDump` writes a dump of the current database to the specified folder. For example, after calling `$keeper->writeDump('/tmp/schema_keeper')` the contents of the /tmp/schema_keeper folder will be as follows:
+### saveDump
+`saveDump` writes a dump of the current database to the specified folder. For example, after calling `$keeper->saveDump('/tmp/schema_keeper')` the contents of the /tmp/schema_keeper folder will be as follows:
 
 ```
 /tmp/schema_keeper:
@@ -79,7 +79,7 @@ In the folder `structure`, folders are created for each scheme that exists in th
 files with the source code of each stored procedure from the current schema, and the `tables` folder contains files with the structure and relations of each table.
 
 ### verifyDump
-After the dump is saved with `writeDump` function, the current state of the database becomes stored in the file system, so
+After the dump is saved with `saveDump` function, the current state of the database becomes stored in the file system, so
 it becomes possible to check whether the database structure has changed after the dump has been saved. For this purpose is provided
 function `verifyDump`. For example, consider checking for changes using PHPUnit:
 
