@@ -1,6 +1,6 @@
 {
   "name": "schema-keeper/schema-keeper",
-  "description": "Library for simplify development and deploy of PHP projects, which uses PostgreSQL database",
+  "description": "Library to simplify the development and deployment of PHP-projects that use PostgreSQL",
   "minimum-stability": "stable",
   "type": "library",
   "license": "MIT",
