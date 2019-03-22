@@ -10,7 +10,7 @@
     "postgresql",
     "postgres",
     "plpgsql",
-    "PL/pgSQL",
+    "pgsql",
     "schema",
     "dump",
     "sync",
