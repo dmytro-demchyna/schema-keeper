@@ -23,7 +23,7 @@ $keeper = new Keeper($conn, $params);
 ```
 
 ## Specification
-**SchemaKeeper** library to simplify the development and deployment of PHP projects that use PostgreSQL. It works with PostgreSQL 9.4+.
+**SchemaKeeper** library to simplify the development and deployment of PHP projects that use PostgreSQL (>= 9.4).
 
 The essence of the library's work is to write database structure to the file system and provide functions for comparing stored structure with current database structure, as well as for automatically applying changes in the source code of stored procedures.
 
