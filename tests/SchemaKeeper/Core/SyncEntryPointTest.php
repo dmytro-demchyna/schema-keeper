@@ -259,4 +259,19 @@ $function$
 
         self::assertEquals($expected, $actual);
     }
+
+    /**
+     * @expectedException \PDOException
+     * @expectedExceptionMessage TARGET: public.trig_test()
+     */
+    public function testError()
+    {
+        $this->dumpEntryPoint->execute('/tmp/schema_keeper');
+
+        $function = 'fd';
+
+        file_put_contents('/tmp/schema_keeper/structure/public/functions/trig_test().sql', $function);
+
+        $this->target->execute('/tmp/schema_keeper');
+    }
 }

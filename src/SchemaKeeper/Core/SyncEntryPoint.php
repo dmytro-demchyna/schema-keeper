@@ -101,30 +101,42 @@ class SyncEntryPoint
         $functionNamesToDelete = array_diff($actualFunctionNames, $expectedFunctionNames);
         $functionsToChange = array_diff_assoc($expectedFunctions, $functions);
 
-        foreach ($functionNamesToDelete as $nameToDelete) {
-            $sqlDelete = 'DROP FUNCTION ' . $nameToDelete;
-            $conn->exec($sqlDelete);
+        $lastExecutedName = null;
 
-            unset($functionsToChange[$nameToDelete]);
-        }
+        try {
+            foreach ($functionNamesToDelete as $nameToDelete) {
+                $lastExecutedName = $nameToDelete;
+                $sqlDelete = 'DROP FUNCTION ' . $nameToDelete;
+                $conn->exec($sqlDelete);
 
-        foreach ($functionNamesToCreate as $nameToCreate) {
-            $functionContent = $expectedFunctions[$nameToCreate];
-            $conn->exec($functionContent);
-
-            unset($functionsToChange[$nameToCreate]);
-        }
-
-        foreach ($functionsToChange as $nameToChange => $contentToChange) {
-            try {
-                $this->savepointHelper->beginTransaction('before_change');
-                $conn->exec($contentToChange);
-                $this->savepointHelper->commit('before_change');
-            } catch (Exception $e) {
-                $this->savepointHelper->rollback('before_change');
-                $conn->exec('DROP FUNCTION ' . $nameToChange);
-                $conn->exec($contentToChange);
+                unset($functionsToChange[$nameToDelete]);
             }
+
+            foreach ($functionNamesToCreate as $nameToCreate) {
+                $lastExecutedName = $nameToCreate;
+                $functionContent = $expectedFunctions[$nameToCreate];
+                $conn->exec($functionContent);
+
+                unset($functionsToChange[$nameToCreate]);
+            }
+
+            foreach ($functionsToChange as $nameToChange => $contentToChange) {
+                try {
+                    $lastExecutedName = $nameToChange;
+                    $this->savepointHelper->beginTransaction('before_change');
+                    $conn->exec($contentToChange);
+                    $this->savepointHelper->commit('before_change');
+                } catch (Exception $e) {
+                    $this->savepointHelper->rollback('before_change');
+                    $conn->exec('DROP FUNCTION ' . $nameToChange);
+                    $conn->exec($contentToChange);
+                }
+            }
+        }
+        catch (\PDOException $e) {
+            $extendedException = new \PDOException($e->getMessage()."\nTARGET: $lastExecutedName", $e->getCode(), $e);
+
+            throw $extendedException;
         }
 
         $actualFunctions = $this->provider->getFunctions();
