@@ -8,6 +8,7 @@
 namespace SchemaKeeper\Filesystem;
 
 use Exception;
+use SchemaKeeper\Exception\KeeperException;
 
 class FilesystemHelper
 {
@@ -30,7 +31,7 @@ class FilesystemHelper
         $content = file_get_contents($filename);
 
         if ($content === false) {
-            throw new Exception('file_get_contents error on: '.$filename);
+            throw new KeeperException('file_get_contents error on: '.$filename);
         }
 
         return $content;
@@ -46,7 +47,7 @@ class FilesystemHelper
         $result = file_put_contents($filename, $data);
 
         if ($result === false) {
-            throw new Exception('file_put_contents error on: '.$filename);
+            throw new KeeperException('file_put_contents error on: '.$filename);
         }
     }
 
@@ -70,7 +71,7 @@ class FilesystemHelper
         $result = mkdir($pathname, $mode, $recursive);
 
         if ($result === false) {
-            throw new Exception('mkdir error on: '.$pathname);
+            throw new KeeperException('mkdir error on: '.$pathname);
         }
     }
 

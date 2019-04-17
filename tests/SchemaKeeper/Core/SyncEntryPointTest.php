@@ -261,7 +261,7 @@ $function$
     }
 
     /**
-     * @expectedException \PDOException
+     * @expectedException \SchemaKeeper\Exception\KeeperException
      * @expectedExceptionMessage TARGET: public.trig_test()
      */
     public function testError()

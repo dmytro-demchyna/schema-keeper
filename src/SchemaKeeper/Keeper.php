@@ -12,6 +12,7 @@ use PDO;
 use SchemaKeeper\Core\DumpEntryPoint;
 use SchemaKeeper\Core\SyncEntryPoint;
 use SchemaKeeper\Core\TestEntryPoint;
+use SchemaKeeper\Exception\KeeperException;
 use SchemaKeeper\Provider\PostgreSQL\PSQLParameters;
 
 /**
@@ -43,7 +44,7 @@ class Keeper
     public function __construct(PDO $conn, PSQLParameters $parameters)
     {
         if ($conn->getAttribute(PDO::ATTR_DRIVER_NAME) !== 'pgsql') {
-            throw new Exception('Only pgsql driver is supported');
+            throw new KeeperException('Only pgsql driver is supported');
         }
 
         $this->dumpEntryPoint = new DumpEntryPoint($conn, $parameters);

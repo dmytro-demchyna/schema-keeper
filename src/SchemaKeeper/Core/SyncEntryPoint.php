@@ -9,6 +9,7 @@ namespace SchemaKeeper\Core;
 
 use Exception;
 use PDO;
+use SchemaKeeper\Exception\KeeperException;
 use SchemaKeeper\Filesystem\DumpReader;
 use SchemaKeeper\Filesystem\FilesystemHelper;
 use SchemaKeeper\Filesystem\SectionReader;
@@ -132,11 +133,10 @@ class SyncEntryPoint
                     $conn->exec($contentToChange);
                 }
             }
-        }
-        catch (\PDOException $e) {
-            $extendedException = new \PDOException($e->getMessage()."\nTARGET: $lastExecutedName", $e->getCode(), $e);
+        } catch (\PDOException $e) {
+            $keeperException = new KeeperException("TARGET: $lastExecutedName\n".$e->getMessage(), 0, $e);
 
-            throw $extendedException;
+            throw $keeperException;
         }
 
         $actualFunctions = $this->provider->getFunctions();
