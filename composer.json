@@ -1,6 +1,6 @@
 {
   "name": "schema-keeper/schema-keeper",
-  "description": "Continuous integration tools for PostgreSQL-projects",
+  "description": "Continuous integration tools for PostgreSQL projects",
   "minimum-stability": "stable",
   "type": "library",
   "license": "MIT",
