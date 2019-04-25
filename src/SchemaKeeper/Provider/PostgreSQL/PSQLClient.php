@@ -118,7 +118,7 @@ class PSQLClient
     {
         exec('command -v psql >/dev/null  || exit 1', $output, $retVal);
 
-        if($retVal !== 0) {
+        if ($retVal !== 0) {
             throw new KeeperException('psql not installed. Please, install "postgresql-client" package');
         }
 
