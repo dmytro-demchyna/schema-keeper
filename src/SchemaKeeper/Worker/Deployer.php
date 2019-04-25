@@ -5,32 +5,26 @@
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
 
-namespace SchemaKeeper\Core;
+namespace SchemaKeeper\Worker;
 
 use Exception;
-use PDO;
+use SchemaKeeper\Core\ArrayConverter;
+use SchemaKeeper\Core\SectionComparator;
 use SchemaKeeper\Exception\KeeperException;
 use SchemaKeeper\Filesystem\DumpReader;
 use SchemaKeeper\Filesystem\FilesystemHelper;
 use SchemaKeeper\Filesystem\SectionReader;
-use SchemaKeeper\Provider\PostgreSQL\PSQLClient;
-use SchemaKeeper\Provider\PostgreSQL\PSQLParameters;
-use SchemaKeeper\Provider\PostgreSQL\PSQLProvider;
+use SchemaKeeper\Provider\IProvider;
 
-class SyncEntryPoint
+class Deployer
 {
-    /**
-     * @var PDO
-     */
-    private $conn;
-
     /**
      * @var DumpReader
      */
     private $reader;
 
     /**
-     * @var PSQLProvider
+     * @var IProvider
      */
     private $provider;
 
@@ -45,40 +39,16 @@ class SyncEntryPoint
     private $converter;
 
     /**
-     * @var SavepointHelper
+     * @param IProvider $provider
      */
-    private $savepointHelper;
-
-    /**
-     * @param PDO $conn
-     * @param PSQLParameters $parameters
-     * @throws Exception
-     */
-    public function __construct(PDO $conn, PSQLParameters $parameters)
+    public function __construct(IProvider $provider)
     {
-        $this->conn = $conn;
         $helper = new FilesystemHelper();
         $sectionReader = new SectionReader($helper);
         $this->reader = new DumpReader($sectionReader, $helper);
         $this->converter = new ArrayConverter();
         $this->comparator = new SectionComparator();
-
-        $client = new PSQLClient(
-            $parameters->getDbName(),
-            $parameters->getHost(),
-            $parameters->getPort(),
-            $parameters->getUser(),
-            $parameters->getPassword()
-        );
-
-        $this->provider = new PSQLProvider(
-            $conn,
-            $client,
-            $parameters->getSkippedSchemaNames(),
-            $parameters->getSkippedExtensionNames()
-        );
-
-        $this->savepointHelper = new SavepointHelper($conn);
+        $this->provider = $provider;
     }
 
     /**
@@ -88,8 +58,6 @@ class SyncEntryPoint
      */
     public function execute($sourcePath)
     {
-        $conn = $this->conn;
-
         $functions = $this->provider->getFunctions();
         $actualFunctionNames = array_keys($functions);
 
@@ -107,8 +75,7 @@ class SyncEntryPoint
         try {
             foreach ($functionNamesToDelete as $nameToDelete) {
                 $lastExecutedName = $nameToDelete;
-                $sqlDelete = 'DROP FUNCTION ' . $nameToDelete;
-                $conn->exec($sqlDelete);
+                $this->provider->deleteFunction($nameToDelete);
 
                 unset($functionsToChange[$nameToDelete]);
             }
@@ -116,22 +83,14 @@ class SyncEntryPoint
             foreach ($functionNamesToCreate as $nameToCreate) {
                 $lastExecutedName = $nameToCreate;
                 $functionContent = $expectedFunctions[$nameToCreate];
-                $conn->exec($functionContent);
+                $this->provider->createFunction($functionContent);
 
                 unset($functionsToChange[$nameToCreate]);
             }
 
             foreach ($functionsToChange as $nameToChange => $contentToChange) {
-                try {
-                    $lastExecutedName = $nameToChange;
-                    $this->savepointHelper->beginTransaction('before_change');
-                    $conn->exec($contentToChange);
-                    $this->savepointHelper->commit('before_change');
-                } catch (Exception $e) {
-                    $this->savepointHelper->rollback('before_change');
-                    $conn->exec('DROP FUNCTION ' . $nameToChange);
-                    $conn->exec($contentToChange);
-                }
+                $lastExecutedName = $nameToChange;
+                $this->provider->changeFunction($nameToChange, $contentToChange);
             }
         } catch (\PDOException $e) {
             $keeperException = new KeeperException("TARGET: $lastExecutedName\n".$e->getMessage(), 0, $e);

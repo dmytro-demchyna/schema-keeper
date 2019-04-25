@@ -11,7 +11,7 @@ use Mockery\MockInterface;
 use SchemaKeeper\Core\Dump;
 use SchemaKeeper\Core\Dumper;
 use SchemaKeeper\Core\SchemaFilter;
-use SchemaKeeper\Provider\PostgreSQL\PSQLProvider;
+use SchemaKeeper\Provider\IProvider;
 use SchemaKeeper\Tests\SchemaTestCase;
 
 class DumperTest extends SchemaTestCase
@@ -22,7 +22,7 @@ class DumperTest extends SchemaTestCase
     private $target;
 
     /**
-     * @var PSQLProvider|MockInterface
+     * @var IProvider|MockInterface
      */
     private $provider;
 
@@ -35,7 +35,7 @@ class DumperTest extends SchemaTestCase
     {
         parent::setUp();
 
-        $this->provider = \Mockery::mock(PSQLProvider::class);
+        $this->provider = \Mockery::mock(IProvider::class);
         $this->filter = \Mockery::mock(SchemaFilter::class);
 
         $this->target = new Dumper($this->provider, $this->filter);

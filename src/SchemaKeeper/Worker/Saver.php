@@ -5,18 +5,17 @@
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
 
-namespace SchemaKeeper\Core;
+namespace SchemaKeeper\Worker;
 
 use Exception;
-use PDO;
+use SchemaKeeper\Core\Dumper;
+use SchemaKeeper\Core\SchemaFilter;
 use SchemaKeeper\Filesystem\DumpWriter;
 use SchemaKeeper\Filesystem\FilesystemHelper;
 use SchemaKeeper\Filesystem\SectionWriter;
-use SchemaKeeper\Provider\PostgreSQL\PSQLClient;
-use SchemaKeeper\Provider\PostgreSQL\PSQLParameters;
-use SchemaKeeper\Provider\PostgreSQL\PSQLProvider;
+use SchemaKeeper\Provider\IProvider;
 
-class DumpEntryPoint
+class Saver
 {
     /**
      * @var Dumper
@@ -29,21 +28,10 @@ class DumpEntryPoint
     private $writer;
 
     /**
-     * @param PDO $conn
-     * @param PSQLParameters $parameters
-     * @throws Exception
+     * @param IProvider $provider
      */
-    public function __construct(PDO $conn, PSQLParameters $parameters)
+    public function __construct(IProvider $provider)
     {
-        $client = new PSQLClient(
-            $parameters->getDbName(),
-            $parameters->getHost(),
-            $parameters->getPort(),
-            $parameters->getUser(),
-            $parameters->getPassword()
-        );
-        $provider = new PSQLProvider($conn, $client, $parameters->getSkippedSchemaNames(), $parameters->getSkippedExtensionNames());
-
         $schemaFilter = new SchemaFilter();
         $this->dumper = new Dumper($provider, $schemaFilter);
         $helper = new FilesystemHelper();

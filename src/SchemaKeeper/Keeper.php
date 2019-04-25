@@ -9,11 +9,10 @@ namespace SchemaKeeper;
 
 use Exception;
 use PDO;
-use SchemaKeeper\Core\DumpEntryPoint;
-use SchemaKeeper\Core\SyncEntryPoint;
-use SchemaKeeper\Core\TestEntryPoint;
-use SchemaKeeper\Exception\KeeperException;
-use SchemaKeeper\Provider\PostgreSQL\PSQLParameters;
+use SchemaKeeper\Provider\ProviderFactory;
+use SchemaKeeper\Worker\Deployer;
+use SchemaKeeper\Worker\Saver;
+use SchemaKeeper\Worker\Verifier;
 
 /**
  * @api
@@ -22,34 +21,34 @@ use SchemaKeeper\Provider\PostgreSQL\PSQLParameters;
 class Keeper
 {
     /**
-     * @var DumpEntryPoint
+     * @var Saver
      */
-    private $dumpEntryPoint;
+    private $saver;
 
     /**
-     * @var SyncEntryPoint
+     * @var Deployer
      */
-    private $syncEntryPoint;
+    private $deployer;
 
     /**
-     * @var TestEntryPoint
+     * @var Verifier
      */
-    private $testEntryPoint;
+    private $verifier;
 
     /**
      * @param PDO $conn
-     * @param PSQLParameters $parameters
+     * @param object $parameters Depends on DBMS. Only PSQLParameters supported now (PostgreSQL)
      * @throws Exception
+     * @see \SchemaKeeper\Provider\PostgreSQL\PSQLParameters
      */
-    public function __construct(PDO $conn, PSQLParameters $parameters)
+    public function __construct(PDO $conn, $parameters = null)
     {
-        if ($conn->getAttribute(PDO::ATTR_DRIVER_NAME) !== 'pgsql') {
-            throw new KeeperException('Only pgsql driver is supported');
-        }
+        $factory = new ProviderFactory();
+        $provider = $factory->createProvider($conn, $parameters);
 
-        $this->dumpEntryPoint = new DumpEntryPoint($conn, $parameters);
-        $this->syncEntryPoint = new SyncEntryPoint($conn, $parameters);
-        $this->testEntryPoint = new TestEntryPoint($conn, $parameters);
+        $this->saver = new Saver($provider);
+        $this->deployer = new Deployer($provider);
+        $this->verifier = new Verifier($provider);
     }
 
     /**
@@ -59,7 +58,7 @@ class Keeper
      */
     public function saveDump($destinationPath)
     {
-        $this->dumpEntryPoint->execute($destinationPath);
+        $this->saver->execute($destinationPath);
     }
 
     /**
@@ -73,7 +72,7 @@ class Keeper
      */
     public function verifyDump($dumpPath)
     {
-        return $this->testEntryPoint->execute($dumpPath);
+        return $this->verifier->execute($dumpPath);
     }
 
     /**
@@ -89,6 +88,6 @@ class Keeper
      */
     public function deployDump($dumpPath)
     {
-        return $this->syncEntryPoint->execute($dumpPath);
+        return $this->deployer->execute($dumpPath);
     }
 }

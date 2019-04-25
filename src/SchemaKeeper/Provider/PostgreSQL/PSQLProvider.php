@@ -7,9 +7,11 @@
 
 namespace SchemaKeeper\Provider\PostgreSQL;
 
+use Exception;
 use PDO;
+use SchemaKeeper\Provider\IProvider;
 
-class PSQLProvider
+class PSQLProvider implements IProvider
 {
     /**
      * @var PDO
@@ -31,6 +33,11 @@ class PSQLProvider
      */
     protected $skippedExtensionNames;
 
+    /**
+     * @var SavepointHelper
+     */
+    protected $savePointHelper;
+
 
     /**
      * @param PDO $conn
@@ -48,6 +55,8 @@ class PSQLProvider
         $this->psqlClient = $psqlClient;
         $this->skippedSchemaNames = $skippedSchemaNames;
         $this->skippedExtensionNames = $skippedExtensionNames;
+
+        $this->savePointHelper = new SavepointHelper($conn);
     }
 
     /**
@@ -321,6 +330,30 @@ class PSQLProvider
         }
 
         return $actualSequences;
+    }
+
+    public function createFunction($definition)
+    {
+        $this->conn->exec($definition);
+    }
+
+    public function deleteFunction($name)
+    {
+        $sqlDelete = 'DROP FUNCTION ' . $name;
+        $this->conn->exec($sqlDelete);
+    }
+
+    public function changeFunction($name, $definition)
+    {
+        try {
+            $this->savePointHelper->beginTransaction('before_change');
+            $this->conn->exec($definition);
+            $this->savePointHelper->commit('before_change');
+        } catch (Exception $e) {
+            $this->savePointHelper->rollback('before_change');
+            $this->conn->exec('DROP FUNCTION ' . $name);
+            $this->conn->exec($definition);
+        }
     }
 
     /**

@@ -5,11 +5,11 @@
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
 
-namespace SchemaKeeper\Tests\Core;
+namespace SchemaKeeper\Tests\Provider\PostgreSQL;
 
 use Mockery\MockInterface;
 use PDO;
-use SchemaKeeper\Core\SavepointHelper;
+use SchemaKeeper\Provider\PostgreSQL\SavepointHelper;
 use SchemaKeeper\Tests\SchemaTestCase;
 
 class SavepointHelperTest extends SchemaTestCase

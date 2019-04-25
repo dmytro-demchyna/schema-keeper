@@ -5,24 +5,25 @@
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
 
-namespace SchemaKeeper\Tests\Core;
+namespace SchemaKeeper\Tests\Worker;
 
 use PDO;
-use SchemaKeeper\Core\DumpEntryPoint;
-use SchemaKeeper\Core\SyncEntryPoint;
+use SchemaKeeper\Provider\ProviderFactory;
 use SchemaKeeper\Tests\SchemaTestCase;
+use SchemaKeeper\Worker\Deployer;
+use SchemaKeeper\Worker\Saver;
 
-class SyncEntryPointTest extends SchemaTestCase
+class DeployerTest extends SchemaTestCase
 {
     /**
-     * @var SyncEntryPoint
+     * @var Deployer
      */
     private $target;
 
     /**
-     * @var DumpEntryPoint
+     * @var Saver
      */
-    private $dumpEntryPoint;
+    private $saver;
 
     /**
      * @var PDO
@@ -35,8 +36,11 @@ class SyncEntryPointTest extends SchemaTestCase
 
         $this->conn = $this->getConn();
         $params = $this->getDbParams();
-        $this->target = new SyncEntryPoint($this->conn, $params);
-        $this->dumpEntryPoint = new DumpEntryPoint($this->conn, $params);
+        $providerFactory = new ProviderFactory();
+        $provider = $providerFactory->createProvider($this->conn, $params);
+
+        $this->target = new Deployer($provider);
+        $this->saver = new Saver($provider);
 
         exec('rm -rf /tmp/schema_keeper');
         $this->conn->beginTransaction();
@@ -53,7 +57,7 @@ class SyncEntryPointTest extends SchemaTestCase
 
     public function testOk()
     {
-        $this->dumpEntryPoint->execute('/tmp/schema_keeper');
+        $this->saver->execute('/tmp/schema_keeper');
         $actual = $this->target->execute('/tmp/schema_keeper');
 
         $expected = [
@@ -69,7 +73,7 @@ class SyncEntryPointTest extends SchemaTestCase
 
     public function testCreateFunction()
     {
-        $this->dumpEntryPoint->execute('/tmp/schema_keeper');
+        $this->saver->execute('/tmp/schema_keeper');
 
         $function = 'CREATE OR REPLACE FUNCTION public.func_test()
  RETURNS void
@@ -101,7 +105,7 @@ $function$
 
     public function testChangeFunction()
     {
-        $this->dumpEntryPoint->execute('/tmp/schema_keeper');
+        $this->saver->execute('/tmp/schema_keeper');
 
         $function = 'CREATE OR REPLACE FUNCTION public.trig_test()
  RETURNS trigger
@@ -134,7 +138,7 @@ $function$
 
     public function testChangeFunctionWithDiff()
     {
-        $this->dumpEntryPoint->execute('/tmp/schema_keeper');
+        $this->saver->execute('/tmp/schema_keeper');
 
         $function = 'cREATE OR REPLACE FUNCTION public.trig_test()
  RETURNS trigger
@@ -185,7 +189,7 @@ $function$
 
     public function testDeleteFunction()
     {
-        $this->dumpEntryPoint->execute('/tmp/schema_keeper');
+        $this->saver->execute('/tmp/schema_keeper');
 
         $function = 'CREATE OR REPLACE FUNCTION public.func_test()
  RETURNS void
@@ -230,7 +234,7 @@ $function$
 
         $this->conn->exec($function);
 
-        $this->dumpEntryPoint->execute('/tmp/schema_keeper');
+        $this->saver->execute('/tmp/schema_keeper');
 
         $changedFunction = 'CREATE OR REPLACE FUNCTION public.func_test()
  RETURNS boolean
@@ -266,7 +270,7 @@ $function$
      */
     public function testError()
     {
-        $this->dumpEntryPoint->execute('/tmp/schema_keeper');
+        $this->saver->execute('/tmp/schema_keeper');
 
         $function = 'fd';
 

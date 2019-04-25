@@ -5,23 +5,24 @@
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
 
-namespace SchemaKeeper\Tests\Core;
+namespace SchemaKeeper\Tests\Worker;
 
-use SchemaKeeper\Core\DumpEntryPoint;
-use SchemaKeeper\Core\TestEntryPoint;
+use SchemaKeeper\Provider\ProviderFactory;
 use SchemaKeeper\Tests\SchemaTestCase;
+use SchemaKeeper\Worker\Saver;
+use SchemaKeeper\Worker\Verifier;
 
-class TestEntryPointTest extends SchemaTestCase
+class VerifierTest extends SchemaTestCase
 {
     /**
-     * @var TestEntryPoint
+     * @var Verifier
      */
     private $target;
 
     /**
-     * @var DumpEntryPoint
+     * @var Saver
      */
-    private $dumpEntryPoint;
+    private $saver;
 
     public function setUp()
     {
@@ -29,15 +30,18 @@ class TestEntryPointTest extends SchemaTestCase
 
         $conn = $this->getConn();
         $params = $this->getDbParams();
-        $this->target = new TestEntryPoint($conn, $params);
-        $this->dumpEntryPoint = new DumpEntryPoint($conn, $params);
+        $providerFactory = new ProviderFactory();
+        $provider = $providerFactory->createProvider($conn, $params);
+
+        $this->target = new Verifier($provider);
+        $this->saver = new Saver($provider);
 
         exec('rm -rf /tmp/schema_keeper');
     }
 
     public function testOk()
     {
-        $this->dumpEntryPoint->execute('/tmp/schema_keeper');
+        $this->saver->execute('/tmp/schema_keeper');
         $this->target->execute('/tmp/schema_keeper');
 
         self::assertTrue(true);
@@ -45,7 +49,7 @@ class TestEntryPointTest extends SchemaTestCase
 
     public function testDiff()
     {
-        $this->dumpEntryPoint->execute('/tmp/schema_keeper');
+        $this->saver->execute('/tmp/schema_keeper');
         exec('rm -r /tmp/schema_keeper/structure/public/triggers');
 
         $expected = [

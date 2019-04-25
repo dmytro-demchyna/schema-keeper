@@ -5,15 +5,16 @@
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
 
-namespace SchemaKeeper\Tests\Core;
+namespace SchemaKeeper\Tests\Worker;
 
-use SchemaKeeper\Core\DumpEntryPoint;
+use SchemaKeeper\Provider\ProviderFactory;
 use SchemaKeeper\Tests\SchemaTestCase;
+use SchemaKeeper\Worker\Saver;
 
-class DumpEntryPointTest extends SchemaTestCase
+class SaverTest extends SchemaTestCase
 {
     /**
-     * @var DumpEntryPoint
+     * @var Saver
      */
     private $target;
 
@@ -23,7 +24,10 @@ class DumpEntryPointTest extends SchemaTestCase
 
         $conn = $this->getConn();
         $params = $this->getDbParams();
-        $this->target = new DumpEntryPoint($conn, $params);
+        $providerFactory = new ProviderFactory();
+        $provider = $providerFactory->createProvider($conn, $params);
+
+        $this->target = new Saver($provider);
 
         exec('rm -rf /tmp/schema_keeper');
     }

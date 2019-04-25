@@ -7,12 +7,12 @@
 
 namespace SchemaKeeper\Core;
 
-use SchemaKeeper\Provider\PostgreSQL\PSQLProvider;
+use SchemaKeeper\Provider\IProvider;
 
 class Dumper
 {
     /**
-     * @var PSQLProvider
+     * @var IProvider
      */
     private $provider;
 
@@ -22,10 +22,10 @@ class Dumper
     private $filter;
 
     /**
-     * @param PSQLProvider $provider
+     * @param IProvider $provider
      * @param SchemaFilter $filter
      */
-    public function __construct(PSQLProvider $provider, SchemaFilter $filter)
+    public function __construct(IProvider $provider, SchemaFilter $filter)
     {
         $this->provider = $provider;
         $this->filter = $filter;
