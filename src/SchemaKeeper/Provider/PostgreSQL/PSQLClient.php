@@ -7,6 +7,8 @@
 
 namespace SchemaKeeper\Provider\PostgreSQL;
 
+use SchemaKeeper\Exception\KeeperException;
+
 class PSQLClient
 {
     /**
@@ -53,10 +55,11 @@ class PSQLClient
     /**
      * @param string $command
      * @return string|null
+     * @throws KeeperException
      */
     public function run($command)
     {
-        putenv("PGPASSWORD=" . $this->password);
+        $this->verifyEnvironment();
 
         $req = "echo " . escapeshellarg($command) . " | psql -U" . $this->user . " -h" . $this->host . " -p" . $this->port . " -d" . $this->dbName;
 
@@ -66,10 +69,11 @@ class PSQLClient
     /**
      * @param array $commands
      * @return array
+     * @throws KeeperException
      */
     public function runMultiple(array $commands)
     {
-        putenv("PGPASSWORD=" . $this->password);
+        $this->verifyEnvironment();
 
         if (!$commands) {
             return [];
@@ -108,5 +112,16 @@ class PSQLClient
         }
 
         return $results;
+    }
+
+    private function verifyEnvironment()
+    {
+        exec('command -v psql >/dev/null  || exit 1', $output, $retVal);
+
+        if($retVal !== 0) {
+            throw new KeeperException('psql not installed. Please, install "postgresql-client" package');
+        }
+
+        putenv("PGPASSWORD=" . $this->password);
     }
 }
