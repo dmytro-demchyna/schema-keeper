@@ -1,6 +1,6 @@
 # SchemaKeeper
 
-Please, read [this article](https://github.com/dmytro-demchyna/schema-keeper/wiki/Database-continuous-integration-using-SchemaKeeper) for better understanding SchemaKeeper goals.
+Please, read [this article](https://github.com/dmytro-demchyna/schema-keeper/wiki/Database-continuous-integration-using-SchemaKeeper) to better understand SchemaKeeper goals.
 
 ## Installation
 
