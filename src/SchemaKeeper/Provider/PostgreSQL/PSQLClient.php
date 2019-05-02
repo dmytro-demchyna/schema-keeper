@@ -42,9 +42,16 @@ class PSQLClient
      * @param string $port
      * @param string $user
      * @param string $password
+     * @throws KeeperException
      */
     public function __construct($dbName, $host, $port, $user, $password)
     {
+        exec('command -v psql >/dev/null 2>&1 || exit 1', $output, $retVal);
+
+        if ($retVal !== 0) {
+            throw new KeeperException('psql not installed. Please, install "postgresql-client" package');
+        }
+
         $this->dbName = $dbName;
         $this->host = $host;
         $this->port = $port;
@@ -59,7 +66,7 @@ class PSQLClient
      */
     public function run($command)
     {
-        $this->verifyEnvironment();
+        $this->putPassword();
 
         $req = "echo " . escapeshellarg($command) . " | psql -U" . $this->user . " -h" . $this->host . " -p" . $this->port . " -d" . $this->dbName;
 
@@ -73,7 +80,7 @@ class PSQLClient
      */
     public function runMultiple(array $commands)
     {
-        $this->verifyEnvironment();
+        $this->putPassword();
 
         if (!$commands) {
             return [];
@@ -114,14 +121,8 @@ class PSQLClient
         return $results;
     }
 
-    private function verifyEnvironment()
+    private function putPassword()
     {
-        exec('command -v psql >/dev/null  || exit 1', $output, $retVal);
-
-        if ($retVal !== 0) {
-            throw new KeeperException('psql not installed. Please, install "postgresql-client" package');
-        }
-
         putenv("PGPASSWORD=" . $this->password);
     }
 }
