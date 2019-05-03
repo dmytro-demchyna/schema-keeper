@@ -16,8 +16,8 @@ cache:
 
 script:
   - docker-compose up -d
-  - ./docker/bin/composer_download.sh
-  - ./docker/bin/composer_install.sh
+  - composer install
+  - ./docker/bin/code_fix.sh
   - ./docker/bin/run_tests.sh
 
 before_cache:
