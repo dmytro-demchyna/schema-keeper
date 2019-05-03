@@ -178,7 +178,7 @@ $user = 'username';
 $password = 'password';
 
 $dsn = 'pgsql:dbname=' . $dbName . ';host=' . $host.';port='.$port;
-$conn = new \PDO($dsn, $user, $password, [\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION]);
+$conn = new PDO($dsn, $user, $password, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
 
 $params = new PSQLParameters($host, $port, $dbName, $user, $password);
 $keeper = new Keeper($conn, $params);
