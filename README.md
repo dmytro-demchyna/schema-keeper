@@ -171,9 +171,15 @@ try {
 use SchemaKeeper\Keeper;
 use SchemaKeeper\Provider\PostgreSQL\PSQLParameters;
 
-$params = new PSQLParameters('localhost', 5432, 'dbname', 'username', 'password');
-$dsn = 'pgsql:dbname=' . $params->getDbName() . ';host=' . $params->getHost();
-$conn = new \PDO($dsn, $params->getUser(), $params->getPassword(), [\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION]);
+$host = 'localhost';
+$port = 5432;
+$dbName = 'dbname';
+$user = 'username';
+$password = 'password';
 
+$dsn = 'pgsql:dbname=' . $dbName . ';host=' . $host.';port='.$port;
+$conn = new \PDO($dsn, $user, $password, [\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION]);
+
+$params = new PSQLParameters($host, $port, $dbName, $user, $password);
 $keeper = new Keeper($conn, $params);
 ```
