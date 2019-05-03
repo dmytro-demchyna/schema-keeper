@@ -5,3 +5,6 @@ services:
 
 script:
   - docker-compose up -d
+  - ./docker/bin/composer_download.sh
+  - ./docker/bin/composer_install.sh
+  - ./docker/bin/run_tests.sh
