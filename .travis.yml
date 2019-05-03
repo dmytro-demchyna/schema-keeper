@@ -4,7 +4,7 @@ services:
   - docker
 
 script:
-  - docker-compose up --detach --build
+  - docker-compose up -d --build
   - ./.dev/docker/bin/composer_download.sh
   - ./.dev/docker/bin/composer_update.sh
   - ./.dev/docker/bin/code_fix.sh
