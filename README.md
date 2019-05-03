@@ -12,7 +12,8 @@ $ composer require schema-keeper/schema-keeper
 ```
 
 ## Specification
-**SchemaKeeper**  provides 3 functions:
+SchemaKeeper  provides 3 functions:
+
 ```php
 <?php
 
