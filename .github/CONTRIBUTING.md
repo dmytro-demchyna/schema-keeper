@@ -1,5 +1,9 @@
 # Contributing 
 
+## Contributor Code of Conduct
+
+Please note that this project is released with a [Contributor Code of Conduct](https://github.com/dmytro-demchyna/schema-keeper/blob/master/.github/CODE_OF_CONDUCT.md). By participating in this project you agree to abide by its terms.
+
 ## Environment
 
 Development environment are fully virtualized, so it requires installed [Docker Compose](https://docs.docker.com/compose/).

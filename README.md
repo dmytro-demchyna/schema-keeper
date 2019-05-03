@@ -183,3 +183,6 @@ $conn = new PDO($dsn, $user, $password, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEP
 $params = new PSQLParameters($host, $port, $dbName, $user, $password);
 $keeper = new Keeper($conn, $params);
 ```
+
+## Contributing
+Please refer to [CONTRIBUTING.md](https://github.com/dmytro-demchyna/schema-keeper/blob/master/.github/CONTRIBUTING.md) for information on how to contribute to SchemaKeeper.
