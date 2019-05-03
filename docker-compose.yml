@@ -2,7 +2,7 @@ version: '3'
 
 services:
   php:
-      build: docker/images/php
+      build: ./.dev/docker/images/php
       volumes:
         - ./:/data
       depends_on:
@@ -13,7 +13,7 @@ services:
     ports:
       - "54322:5432"
     volumes:
-      - ./docker/images/postgres/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
-      - ./docker/images/postgres/config:/etc/postgresql
+      - ./.dev/docker/images/postgres/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+      - ./.dev/docker/images/postgres/config:/etc/postgresql
     environment:
       POSTGRES_PASSWORD: postgres

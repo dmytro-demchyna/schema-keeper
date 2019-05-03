@@ -4,11 +4,11 @@ services:
   - docker
 
 script:
-  - docker-compose up -d
-  - ./docker/bin/composer_download.sh
-  - ./docker/bin/composer_update.sh
-  - ./docker/bin/code_fix.sh
-  - ./docker/bin/run_tests.sh
+  - docker-compose up --detach --build
+  - ./.dev/docker/bin/composer_download.sh
+  - ./.dev/docker/bin/composer_update.sh
+  - ./.dev/docker/bin/code_fix.sh
+  - ./.dev/docker/bin/run_tests.sh
 
 notifications:
   email: false
