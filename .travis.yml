@@ -9,3 +9,6 @@ script:
   - ./docker/bin/composer_install.sh
   - ./docker/bin/code_fix.sh
   - ./docker/bin/run_tests.sh
+
+notifications:
+  email: false
