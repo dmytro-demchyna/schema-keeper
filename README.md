@@ -13,9 +13,13 @@ $ composer require schema-keeper/schema-keeper
 
 ## Specification
 **SchemaKeeper**  provides 3 functions:
-* `$keeper->saveDump('path_to_dump')`
-* `$keeper->verifyDump('path_to_dump')`
-* `$keeper->deployDump('path_to_dump')`
+```php
+<?php
+
+$keeper->saveDump('path_to_dump');
+$keeper->verifyDump('path_to_dump');
+$keeper->deployDump('path_to_dump');
+```
 
 ### saveDump
 `saveDump` writes a dump of the current database to the specified folder. For example, after calling `$keeper->saveDump('/tmp/schema_keeper')` the contents of the `/tmp/schema_keeper` folder will be as follows:
@@ -57,9 +61,6 @@ $ composer require schema-keeper/schema-keeper
                 ...
         ...
 ```
-
-In the folder `structure`, folders are created for each scheme that exists in the database. In each of the schema folders, folders will be created for each section of the database structure (tables, triggers etc). For example, the `functions` folder will contain
-files with the source code of each stored procedure from the current schema, and the `tables` folder contains files with the structure and relations of each table.
 
 ### verifyDump
 After the dump is saved with `saveDump` function, the current state of the database becomes stored in the file system, so
