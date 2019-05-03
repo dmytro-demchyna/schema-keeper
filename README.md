@@ -93,9 +93,8 @@ class SchemaTest extends \PHPUnit\Framework\TestCase
 {
     function testOk()
     {
-        // Initialize $conn and $dbParams here...
+        // Initialize $keeper here...
         
-        $keeper = new \SchemaKeeper\Keeper($conn, $dbParams);
         $result = $keeper->verifyDump('/path_to_dump');
 
         if ($result['expected'] !== $result['actual']) {
@@ -114,14 +113,31 @@ class SchemaTest extends \PHPUnit\Framework\TestCase
 
 ### deployDump
 
-The `deployDump` function automatically adjusts the stored procedures of the database in accordance with the dump.
+The `deployDump` function automatically deploys changes in stored procedures to the actual database in accordance with the saved dump. 
 
-`deployDump` works exclusively with stored procedures. Other changes in the database structure must be deployed in the classical way - through migrations.
+The `deployDump` works exclusively with stored procedures. Other changes in the database structure must be deployed in the classical way - through migrations.
 
-Script that calls `deployDump` and displays the result:
+Example:
 
 ```php
 <?php
+
+// Initialize $keeper here...
+
+$result = $keeper->deployDump('/path_to_dump');
+
+print_r($result['deleted']); // These functions were deleted from the current database
+print_r($result['created']); // These functions were created in the current database
+print_r($result['changed']); // These functions were changed in the current database
+
+if($result['expected'] !== $result['actual']) {
+    throw new \Exception('Deploy failure');
+}
+```
+
+You can wrap `deployDump` into transaction block:
+
+```php
 
 // Initialize $conn and $dbParams here...
 
@@ -132,27 +148,14 @@ $conn->beginTransaction();
 try {
     $result = $keeper->deployDump('/path_to_dump');
 
-    foreach ($result['deleted'] as $nameDeleted) {
-        echo "Deleted $nameDeleted\n";
-    }
-
-    foreach ($result['created'] as $nameCreated) {
-        echo "Created $nameCreated\n";
-    }
-
-    foreach ($result['changed'] as $nameChanged) {
-        echo "Changed $nameChanged\n";
-    }
-
     if($result['expected'] !== $result['actual']) {
         throw new \Exception('Deploy failure');
     }
 
-    echo "Schema sync successful\n";
+    echo "Success\n";
 
     $conn->commit();
-}
-catch (\Exception $e) {
+} catch (\Exception $e) {
     $conn->rollBack();
 
     echo "$e\n";
