@@ -22,7 +22,15 @@ $keeper->deployDump('path_to_dump');
 ```
 
 ### saveDump
-`saveDump` writes a dump of the current database to the specified folder. For example, after calling `$keeper->saveDump('/tmp/schema_keeper')` the contents of the `/tmp/schema_keeper` folder will be as follows:
+`saveDump` writes a dump of the current database to the specified folder. For example, after calling 
+
+```php
+<?php
+
+$keeper->saveDump('/tmp/schema_keeper');
+```
+ 
+the contents of the `/tmp/schema_keeper` folder will be as follows:
 
 ```
 /tmp/schema_keeper:
@@ -63,9 +71,20 @@ $keeper->deployDump('path_to_dump');
 ```
 
 ### verifyDump
-After the dump is saved with `saveDump` function, the current state of the database becomes stored in the file system, so
-it becomes possible to check whether the database structure has changed after the dump has been saved. For this purpose is provided
-function `verifyDump`. For example, consider checking for changes using PHPUnit:
+`verifyDump` checks whether the database structure has changed after the dump has been saved. 
+
+For example:
+```php
+<?php
+
+$result = $keeper->verifyDump('/path_to_dump');
+
+if ($result['expected'] !== $result['actual']) {
+    echo 'There are changes...';
+}
+```
+
+You can wrap `verifyDump` into the PHPUnit test:
 
 ```php
 <?php
@@ -83,6 +102,7 @@ class SchemaTest extends \PHPUnit\Framework\TestCase
             $expectedFormatted = print_r($result['expected'], true);
             $actualFormatted = print_r($result['actual'], true);
 
+            // assertEquals will show the detailed diff between the saved dump and actual database
             self::assertEquals($expectedFormatted, $actualFormatted);
         }
 
@@ -91,8 +111,6 @@ class SchemaTest extends \PHPUnit\Framework\TestCase
 }
 
 ```
-
-In case of inconsistency between the current database structure and the saved dump, assertEquals will show the difference.
 
 ### deployDump
 
