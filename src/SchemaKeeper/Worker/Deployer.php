@@ -72,8 +72,7 @@ class Deployer
 
         $lastExecutedName = null;
 
-        try
-        {
+        try {
             foreach ($functionNamesToDelete as $nameToDelete) {
                 $lastExecutedName = $nameToDelete;
                 $this->provider->deleteFunction($nameToDelete);
