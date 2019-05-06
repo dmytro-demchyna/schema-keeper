@@ -3,9 +3,6 @@ language: minimal
 services:
   - docker
 
-env:
-  - CODECOV_TOKEN="a81d84ce-aefc-4670-beba-83c6d26b7d05"
-
 script:
   - docker-compose up -d --build
   - ./.dev/docker/bin/composer_download.sh
