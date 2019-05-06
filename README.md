@@ -3,6 +3,7 @@
 [![Minimum PHP Version](https://img.shields.io/badge/PHP-%3E%3D%205.6-8892BF.svg?style=flat-square)](https://php.net/)
 [![Minimum PostgreSQL Version](https://img.shields.io/badge/PostgreSQL-%3E%3D%209.4-8892BF.svg?style=flat-square)](https://www.postgresql.org/)
 [![Build Status](https://travis-ci.com/dmytro-demchyna/schema-keeper.svg?branch=master)](https://travis-ci.com/dmytro-demchyna/schema-keeper)
+[![Codecov](https://codecov.io/gh/dmytro-demchyna/schema-keeper/branch/master/graphs/badge.svg)](https://codecov.io/gh/dmytro-demchyna/schema-keeper)
 
 Please, read [this article](https://github.com/dmytro-demchyna/schema-keeper/wiki/Database-continuous-integration-using-SchemaKeeper) to better understand SchemaKeeper goals.
 
