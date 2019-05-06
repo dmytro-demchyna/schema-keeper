@@ -5,7 +5,7 @@
 [![Build Status](https://travis-ci.com/dmytro-demchyna/schema-keeper.svg?branch=master)](https://travis-ci.com/dmytro-demchyna/schema-keeper)
 [![Codecov](https://codecov.io/gh/dmytro-demchyna/schema-keeper/branch/master/graphs/badge.svg)](https://codecov.io/gh/dmytro-demchyna/schema-keeper)
 
-Please, read [this article](https://github.com/dmytro-demchyna/schema-keeper/wiki/Database-continuous-integration-using-SchemaKeeper) to better understand SchemaKeeper goals.
+Please, read [wiki](https://github.com/dmytro-demchyna/schema-keeper/wiki/Database-continuous-integration-using-SchemaKeeper) to better understand SchemaKeeper goals.
 
 ## Installation
 
