@@ -118,8 +118,6 @@ class SchemaTest extends \PHPUnit\Framework\TestCase
 
 The `deployDump` function automatically deploys changes in stored procedures to the actual database in accordance with the saved dump. 
 
-The `deployDump` works exclusively with stored procedures. Other changes in the database structure must be deployed in the classical way - through migrations.
-
 Example:
 
 ```php
@@ -164,6 +162,8 @@ try {
     echo "$e\n";
 }
 ```
+
+The `deployDump` works exclusively with stored procedures. Other changes in the database structure must be deployed in the classical way - through migrations.
 
 ## Configuration
 > You must install `postgresql-client` on the machines where SchemaKeeper will be used, since the [psql](https://www.postgresql.org/docs/current/app-psql.html) is used to interact with the database in some cases.
