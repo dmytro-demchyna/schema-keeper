@@ -1,0 +1,63 @@
+#!/usr/bin/env php
+<?php
+
+use SchemaKeeper\CLI\Parser;
+use SchemaKeeper\CLI\Runner;
+use SchemaKeeper\Keeper;
+
+if (php_sapi_name() != 'cli') {
+    throw new \RuntimeException('Please, run this script in CLI mode');
+}
+
+foreach ([
+             __DIR__ . '/../../autoload.php',
+             __DIR__ . '/../vendor/autoload.php',
+             __DIR__ . '/vendor/autoload.php'
+         ] as $file) {
+    if (file_exists($file)) {
+        define('AUTOLOAD_PATH', $file);
+
+        break;
+    }
+}
+
+if (!defined('AUTOLOAD_PATH')) {
+    throw new \Exception('autoload.php not found');
+}
+
+require AUTOLOAD_PATH;
+
+$options = getopt('c:d:');
+
+if (isset($options['help'])) {
+    die ("
+Usage: schemakeeper [options] <command>
+
+Example: schemakeeper --config /path_to_config.php --path /path_to_dump save
+
+Options:
+\t-c\tThe path to a config file
+\t-d\tThe destination path to a dump
+
+Available commands:
+\tsave
+\tverify
+\tdeploy
+");
+}
+
+$parser = new Parser();
+$parsed = $parser->parse($options, $argv);
+
+$params = $parsed->getParams();
+$path = $parsed->getPath();
+$command = $parsed->getCommand();
+
+$dsn = 'pgsql:dbname=' . $params->getDbName() . ';host=' . $params->getHost() . ';port=' . $params->getPort();
+$conn = new PDO($dsn, $params->getUser(), $params->getPassword(), [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+$keeper = new Keeper($conn, $params);
+$runner = new Runner($keeper);
+
+$result = $runner->run($command, $path);
+
+echo $result;
