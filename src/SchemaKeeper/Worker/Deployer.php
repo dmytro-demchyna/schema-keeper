@@ -10,6 +10,7 @@ namespace SchemaKeeper\Worker;
 use Exception;
 use SchemaKeeper\Core\ArrayConverter;
 use SchemaKeeper\Core\SectionComparator;
+use SchemaKeeper\Exception\DiffException;
 use SchemaKeeper\Exception\KeeperException;
 use SchemaKeeper\Filesystem\DumpReader;
 use SchemaKeeper\Filesystem\FilesystemHelper;
@@ -106,9 +107,19 @@ class Deployer
         $actualFunctions = $this->provider->getFunctions();
         $comparisonResult = $this->comparator->compareSection('functions', $expectedFunctions, $actualFunctions);
 
+        if ($comparisonResult['actual'] !== $comparisonResult['expected']) {
+            $list = array_merge($comparisonResult['expected']['functions'], $comparisonResult['actual']['functions']);
+            $failedNames = array_unique(array_keys($list));
+            $message = 'These functions have diff between their definitions from dump and their definitions after deploy: '.implode(', ', $failedNames);
+
+            $exception = new DiffException($message);
+            $exception->setExpected($comparisonResult['expected']);
+            $exception->setActual($comparisonResult['actual']);
+
+            throw $exception;
+        }
+
         return [
-            'expected' => $comparisonResult['expected'],
-            'actual' => $comparisonResult['actual'],
             'deleted' => $functionNamesToDelete,
             'created' => $functionNamesToCreate,
             'changed' => array_keys($functionsToChange),

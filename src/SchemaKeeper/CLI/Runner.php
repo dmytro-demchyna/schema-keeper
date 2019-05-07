@@ -7,6 +7,7 @@
 
 namespace SchemaKeeper\CLI;
 
+use SchemaKeeper\Exception\KeeperException;
 use SchemaKeeper\Keeper;
 
 class Runner
@@ -32,7 +33,7 @@ class Runner
      */
     public function run($command, $path)
     {
-        $message = 'Undefined';
+        $message = '';
 
         switch ($command) {
             case 'save':
@@ -44,24 +45,32 @@ class Runner
                 $result = $this->keeper->verifyDump($path);
 
                 if ($result['expected'] !== $result['actual']) {
-                    throw new \Exception("Diff ");
+                    throw new KeeperException("Dump and current database not equals: ".json_encode($result));
                 }
 
-                $message = 'Dump successfully verified '.$path;
+                $message = 'Dump verified '.$path;
 
                 break;
             case 'deploy':
                 $result = $this->keeper->deployDump($path);
 
-                if ($result['expected'] !== $result['actual']) {
-                    throw new \Exception("Deploy ");
+                $message = 'Dump deployed '.$path.".\n";
+
+                foreach ($result['deleted'] as $nameDeleted) {
+                    $message .= "Deleted $nameDeleted\n";
                 }
 
-                $message = 'Dump successfully deployed '.$path;
+                foreach ($result['created'] as $nameCreated) {
+                    $message .= "Created $nameCreated\n";
+                }
+
+                foreach ($result['changed'] as $nameChanged) {
+                    $message .= "Changed $nameChanged\n";
+                }
 
                 break;
             default:
-                throw new \Exception("Command ".$command.' not existed');
+                throw new KeeperException("Command ".$command.' not exists');
 
                 break;
         }

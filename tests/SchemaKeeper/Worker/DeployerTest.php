@@ -61,8 +61,6 @@ class DeployerTest extends SchemaTestCase
         $actual = $this->target->execute('/tmp/schema_keeper');
 
         $expected = [
-            'expected' => null,
-            'actual' => null,
             'deleted' => [],
             'created' => [],
             'changed' => [],
@@ -91,8 +89,6 @@ $function$
         $actual = $this->target->execute('/tmp/schema_keeper');
 
         $expected = [
-            'expected' => null,
-            'actual' => null,
             'deleted' => [],
             'created' => [
                 'public.func_test()'
@@ -124,8 +120,6 @@ $function$
         $actual = $this->target->execute('/tmp/schema_keeper');
 
         $expected = [
-            'expected' => null,
-            'actual' => null,
             'deleted' => [],
             'created' => [],
             'changed' => [
@@ -136,6 +130,10 @@ $function$
         self::assertEquals($expected, $actual);
     }
 
+    /**
+     * @expectedException \SchemaKeeper\Exception\DiffException
+     * @expectedExceptionMessage These functions have diff between their definitions from dump and their definitions after deploy: public.trig_test()
+     */
     public function testChangeFunctionWithDiff()
     {
         $this->saver->execute('/tmp/schema_keeper');
@@ -153,38 +151,7 @@ $function$
 
         file_put_contents('/tmp/schema_keeper/structure/public/functions/trig_test().sql', $function);
 
-        $actual = $this->target->execute('/tmp/schema_keeper');
-
-        $functionAfterCompilation = 'CREATE OR REPLACE FUNCTION public.trig_test()
- RETURNS trigger
- LANGUAGE plpgsql
-AS $function$
-DECLARE
-BEGIN
-   RETURN NEW;
-END;
-$function$
-';
-
-        $expected = [
-            'expected' => [
-                'functions' => [
-                    'public.trig_test()' => $function,
-                ]
-            ],
-            'actual' => [
-                'functions' => [
-                    'public.trig_test()' => $functionAfterCompilation,
-                ]
-            ],
-            'deleted' => [],
-            'created' => [],
-            'changed' => [
-                'public.trig_test()'
-            ],
-        ];
-
-        self::assertEquals($expected, $actual);
+        $this->target->execute('/tmp/schema_keeper');
     }
 
     public function testDeleteFunction()
@@ -207,8 +174,6 @@ $function$
         $actual = $this->target->execute('/tmp/schema_keeper');
 
         $expected = [
-            'expected' => null,
-            'actual' => null,
             'deleted' => [
                 'public.func_test()'
             ],
@@ -252,8 +217,6 @@ $function$
         $actual = $this->target->execute('/tmp/schema_keeper');
 
         $expected = [
-            'expected' => null,
-            'actual' => null,
             'deleted' => [],
             'created' => [],
             'changed' => [

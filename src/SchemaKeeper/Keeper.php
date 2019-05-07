@@ -77,8 +77,7 @@ class Keeper
 
     /**
      * Deploy functions from dump previously saved in filesystem.
-     * Function returns array with keys: 'expected', 'actual', 'deleted', 'created', 'changed'
-     * If 'expected' != 'actual' - there is a problem with the files containing the source code of the stored procedures
+     * Function returns array with keys: 'deleted', 'created', 'changed'
      * 'deleted' - list of functions that were deleted from the current database, as they do not exist in the saved dump
      * 'created' - list of functions that were created in the current database, as they do not exist in the saved dump
      * 'changed' - list of functions that were changed in the current database, as their source code is different between saved dump and current database

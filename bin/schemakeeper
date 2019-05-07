@@ -27,17 +27,18 @@ if (!defined('AUTOLOAD_PATH')) {
 
 require AUTOLOAD_PATH;
 
-$options = getopt('c:d:');
+$options = getopt('c:d:', [
+        'help'
+]);
 
 if (isset($options['help'])) {
-    die ("
-Usage: schemakeeper [options] <command>
+    die ("Usage: schemakeeper [options] <command>
 
-Example: schemakeeper --config /path_to_config.php --path /path_to_dump save
+Example: schemakeeper -c /path_to_config.php -d /path_to_dump save
 
 Options:
 \t-c\tThe path to a config file
-\t-d\tThe destination path to a dump
+\t-d\tThe destination path to a dump directory
 
 Available commands:
 \tsave
