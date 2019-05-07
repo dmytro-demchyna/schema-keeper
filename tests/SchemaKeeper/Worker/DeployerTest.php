@@ -278,4 +278,13 @@ $function$
 
         $this->target->execute('/tmp/schema_keeper');
     }
+
+    /**
+     * @expectedException \SchemaKeeper\Exception\KeeperException
+     * @expectedExceptionMessage Forbidden to remove all functions using SchemaKeeper
+     */
+    public function testEmptyDump()
+    {
+        $this->target->execute('/tmp/schema_keeper');
+    }
 }

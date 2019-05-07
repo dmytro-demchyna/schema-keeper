@@ -25,10 +25,9 @@ class ArrayConverter
             'sequences' => 'getSequences',
         ];
 
-        $result = [
-            'schemas' => [],
-            'extensions' => $dump->getExtensions()
-        ];
+        $result = array_combine(array_keys($keysMapping), array_fill(0, count($keysMapping), []));
+        $result['schemas'] = [];
+        $result['extensions'] = $dump->getExtensions();
 
         foreach ($dump->getSchemas() as $schemaDump) {
             $result['schemas'][] = $schemaDump->getSchemaName();

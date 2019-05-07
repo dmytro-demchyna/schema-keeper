@@ -64,6 +64,11 @@ class Deployer
         $structurePath = $sourcePath;
         $expectedDump = $this->reader->read($structurePath);
         $expectedFunctions = $this->converter->dump2Array($expectedDump)['functions'];
+
+        if (!$expectedFunctions) {
+            throw new KeeperException('Forbidden to remove all functions using SchemaKeeper');
+        }
+
         $expectedFunctionNames = array_keys($expectedFunctions);
 
         $functionNamesToCreate = array_diff($expectedFunctionNames, $actualFunctionNames);

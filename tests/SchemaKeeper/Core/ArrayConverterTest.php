@@ -82,4 +82,25 @@ class ArrayConverterTest extends SchemaTestCase
 
         self::assertEquals($expected, $actual);
     }
+
+    function testEmptyDump()
+    {
+        $dump = new Dump([], []);
+
+        $actual = $this->target->dump2Array($dump);
+
+        $expected = [
+            'tables' => [],
+            'views' => [],
+            'materialized_views' => [],
+            'types' => [],
+            'functions' => [],
+            'triggers' => [],
+            'sequences' => [],
+            'schemas' => [],
+            'extensions' => [],
+        ];
+
+        self::assertSame($expected, $actual);
+    }
 }
