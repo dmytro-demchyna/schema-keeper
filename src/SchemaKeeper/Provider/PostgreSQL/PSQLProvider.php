@@ -345,12 +345,14 @@ class PSQLProvider implements IProvider
 
     public function changeFunction($name, $definition)
     {
+        $isTransaction = $this->conn->inTransaction();
+
         try {
-            $this->savePointHelper->beginTransaction('before_change');
+            $this->savePointHelper->beginTransaction('before_change', $isTransaction);
             $this->conn->exec($definition);
-            $this->savePointHelper->commit('before_change');
+            $this->savePointHelper->commit('before_change', $isTransaction);
         } catch (Exception $e) {
-            $this->savePointHelper->rollback('before_change');
+            $this->savePointHelper->rollback('before_change', $isTransaction);
             $this->conn->exec('DROP FUNCTION ' . $name);
             $this->conn->exec($definition);
         }

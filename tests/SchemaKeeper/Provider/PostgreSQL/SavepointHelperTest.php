@@ -35,55 +35,49 @@ class SavepointHelperTest extends SchemaTestCase
 
     public function testBeginTransaction()
     {
-        $this->conn->shouldReceive('inTransaction')->andReturnFalse()->once();
         $this->conn->shouldNotReceive('exec');
         $this->conn->shouldReceive('beginTransaction')->once();
 
-        $this->target->beginTransaction('test');
+        $this->target->beginTransaction('test', false);
     }
 
     public function testBeginTransactionUsingSavepoint()
     {
-        $this->conn->shouldReceive('inTransaction')->andReturnTrue()->once();
         $this->conn->shouldReceive('exec')->with('SAVEPOINT test')->once();
         $this->conn->shouldNotReceive('beginTransaction');
 
-        $this->target->beginTransaction('test');
+        $this->target->beginTransaction('test', true);
     }
 
     public function testCommit()
     {
-        $this->conn->shouldReceive('inTransaction')->andReturnFalse()->once();
         $this->conn->shouldNotReceive('exec');
         $this->conn->shouldReceive('commit')->once();
 
-        $this->target->commit('test');
+        $this->target->commit('test', false);
     }
 
     public function testCommitUsingSavepoint()
     {
-        $this->conn->shouldReceive('inTransaction')->andReturnTrue()->once();
         $this->conn->shouldReceive('exec')->with('RELEASE SAVEPOINT test')->once();
         $this->conn->shouldNotReceive('commit');
 
-        $this->target->commit('test');
+        $this->target->commit('test', true);
     }
 
     public function testRollback()
     {
-        $this->conn->shouldReceive('inTransaction')->andReturnFalse()->once();
         $this->conn->shouldNotReceive('exec');
         $this->conn->shouldReceive('rollback')->once();
 
-        $this->target->rollback('test');
+        $this->target->rollback('test', false);
     }
 
     public function testRollbackUsingSavepoint()
     {
-        $this->conn->shouldReceive('inTransaction')->andReturnTrue()->once();
         $this->conn->shouldReceive('exec')->with('ROLLBACK TO SAVEPOINT test')->once();
         $this->conn->shouldNotReceive('rollback');
 
-        $this->target->rollback('test');
+        $this->target->rollback('test', true);
     }
 }
