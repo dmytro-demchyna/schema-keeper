@@ -126,6 +126,10 @@ $conn = new PDO($dsn, $user, $password, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEP
 
 $params = new PSQLParameters($host, $port, $dbName, $user, $password);
 $keeper = new Keeper($conn, $params);
+```
+
+```php
+<?php
 
 $keeper->saveDump('path_to_dump');
 $keeper->verifyDump('path_to_dump');
