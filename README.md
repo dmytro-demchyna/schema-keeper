@@ -14,7 +14,7 @@ Please, read [wiki](https://github.com/dmytro-demchyna/schema-keeper/wiki/Databa
 $ composer require schema-keeper/schema-keeper
 ```
 
-> You must install [psql](https://www.postgresql.org/docs/current/app-psql.html) on the machines where SchemaKeeper will be used, since it used to interact with the database in some cases.
+> You must install [psql](https://www.postgresql.org/docs/current/app-psql.html) on the machines where SchemaKeeper will be used.
 
 ## CLI Usage
 
