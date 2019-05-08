@@ -41,13 +41,12 @@ SchemaKeeper's binary provides 3 functions:
 1. deploy
 
 ### save
-`save` writes a dump of the current database to the specified folder. 
-
-Example:
 
 ```bash
 $ schemakeeper -c config.php -d /tmp/schema-keeper save
 ```
+
+The `save` writes a dump of the current database to the specified folder. 
  
 After calling the contents of the `/tmp/schema_keeper` will be as follows:
 
@@ -90,27 +89,20 @@ After calling the contents of the `/tmp/schema_keeper` will be as follows:
 ```
 
 ### verify
-`verify` checks whether the database structure has changed after the dump has been saved. 
-
-Example:
 
 ```bash
 $ schemakeeper -c config.php -d /tmp/schema-keeper verify
 ```
 
-If there are no changes, `verify` will finished with exit-code 0
+The `verify` detects changes between the current database structure and saved dump. If there are no changes, `verify` will finished with exit-code 0, otherwise it will display changed objects.
 
 ### deploy
-
-`deploy` automatically deploys changes in stored procedures to the actual database in accordance with the saved dump. 
-
-Example:
 
 ```bash
 $ schemakeeper -c config.php -d /tmp/schema-keeper deploy
 ```
 
-`deploy` works exclusively with stored procedures. Other changes in the database structure must be deployed in the classical way - through migration files.
+The `deploy` automatically deploys changes in stored procedures to the actual database in accordance with the saved dump. It works exclusively with stored procedures. Other changes in the database structure must be deployed in the classical way - through migration files.
 
 
 ## Extended usage
