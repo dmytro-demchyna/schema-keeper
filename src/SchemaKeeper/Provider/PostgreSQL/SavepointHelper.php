@@ -24,27 +24,27 @@ class SavepointHelper
         $this->conn = $conn;
     }
 
-    public function beginTransaction($possibleSavePointName)
+    public function beginTransaction($possibleSavePointName, $isTransaction)
     {
-        if ($this->conn->inTransaction()) {
+        if ($isTransaction) {
             return $this->conn->exec('SAVEPOINT '.$possibleSavePointName);
         }
 
         return $this->conn->beginTransaction();
     }
 
-    public function commit($possibleSavePointName)
+    public function commit($possibleSavePointName, $isTransaction)
     {
-        if ($this->conn->inTransaction()) {
+        if ($isTransaction) {
             return $this->conn->exec('RELEASE SAVEPOINT '.$possibleSavePointName);
         }
 
         return $this->conn->commit();
     }
 
-    public function rollback($possibleSavePointName)
+    public function rollback($possibleSavePointName, $isTransaction)
     {
-        if ($this->conn->inTransaction()) {
+        if ($isTransaction) {
             return $this->conn->exec('ROLLBACK TO SAVEPOINT '.$possibleSavePointName);
         }
 
