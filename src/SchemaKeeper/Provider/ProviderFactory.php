@@ -42,8 +42,8 @@ class ProviderFactory
         $provider = new PSQLProvider(
             $conn,
             $client,
-            $parameters->getSkippedSchemaNames(),
-            $parameters->getSkippedExtensionNames()
+            $parameters->getSkippedSchemas(),
+            $parameters->getSkippedExtensions()
         );
 
         return $provider;

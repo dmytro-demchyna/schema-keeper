@@ -10,7 +10,6 @@ namespace SchemaKeeper\Worker;
 use Exception;
 use SchemaKeeper\Core\ArrayConverter;
 use SchemaKeeper\Core\SectionComparator;
-use SchemaKeeper\Exception\DiffException;
 use SchemaKeeper\Exception\KeeperException;
 use SchemaKeeper\Filesystem\DumpReader;
 use SchemaKeeper\Filesystem\FilesystemHelper;
@@ -54,10 +53,10 @@ class Deployer
 
     /**
      * @param string $sourcePath
-     * @return array
+     * @return DeployResult
      * @throws Exception
      */
-    public function execute($sourcePath)
+    public function deploy($sourcePath)
     {
         $functions = $this->provider->getFunctions();
         $actualFunctionNames = array_keys($functions);
@@ -67,7 +66,7 @@ class Deployer
         $expectedFunctions = $this->converter->dump2Array($expectedDump)['functions'];
 
         if (!$expectedFunctions) {
-            throw new KeeperException('Forbidden to remove all functions using SchemaKeeper');
+            throw new KeeperException('Forbidden to remove all functions using SchemaKeeper. Path: '.$sourcePath);
         }
 
         $expectedFunctionNames = array_keys($expectedFunctions);
@@ -112,17 +111,9 @@ class Deployer
             $failedNames = array_unique(array_keys($list));
             $message = 'These functions have diff between their definitions from dump and their definitions after deploy: '.implode(', ', $failedNames);
 
-            $exception = new DiffException($message);
-            $exception->setExpected($comparisonResult['expected']);
-            $exception->setActual($comparisonResult['actual']);
-
-            throw $exception;
+            throw new KeeperException($message);
         }
 
-        return [
-            'deleted' => $functionNamesToDelete,
-            'created' => $functionNamesToCreate,
-            'changed' => array_keys($functionsToChange),
-        ];
+        return new DeployResult(array_keys($functionsToChange), $functionNamesToCreate, $functionNamesToDelete);
     }
 }

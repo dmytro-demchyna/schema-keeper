@@ -38,39 +38,42 @@ class Runner
         switch ($command) {
             case 'save':
                 $this->keeper->saveDump($path);
-                $message = 'Dump saved to '.$path;
+                $message = 'Dump saved to ' . $path;
 
                 break;
             case 'verify':
                 $result = $this->keeper->verifyDump($path);
 
-                if ($result['expected'] !== $result['actual']) {
-                    throw new KeeperException("Dump and current database not equals: ".json_encode($result));
+                if ($result->getExpected() !== $result->getActual()) {
+                    throw new KeeperException("Dump and current database not equals: " . json_encode([
+                            'expected' => $result->getExpected(),
+                            'actual' => $result->getActual(),
+                        ]));
                 }
 
-                $message = 'Dump verified '.$path;
+                $message = 'Dump verified ' . $path;
 
                 break;
             case 'deploy':
                 $result = $this->keeper->deployDump($path);
 
-                $message = 'Dump deployed '.$path.".\n";
+                $message = 'Dump deployed ' . $path;
 
-                foreach ($result['deleted'] as $nameDeleted) {
-                    $message .= "Deleted $nameDeleted\n";
+                foreach ($result->getDeleted() as $nameDeleted) {
+                    $message .= "\nDeleted $nameDeleted";
                 }
 
-                foreach ($result['created'] as $nameCreated) {
-                    $message .= "Created $nameCreated\n";
+                foreach ($result->getCreated() as $nameCreated) {
+                    $message .= "\nCreated $nameCreated";
                 }
 
-                foreach ($result['changed'] as $nameChanged) {
-                    $message .= "Changed $nameChanged\n";
+                foreach ($result->getChanged() as $nameChanged) {
+                    $message .= "\nChanged $nameChanged";
                 }
 
                 break;
             default:
-                throw new KeeperException("Command ".$command.' not exists');
+                throw new KeeperException("Command " . $command . ' not exists');
 
                 break;
         }

@@ -11,12 +11,13 @@ use Exception;
 use PDO;
 use SchemaKeeper\Provider\ProviderFactory;
 use SchemaKeeper\Worker\Deployer;
+use SchemaKeeper\Worker\DeployResult;
 use SchemaKeeper\Worker\Saver;
 use SchemaKeeper\Worker\Verifier;
+use SchemaKeeper\Worker\VerifyResult;
 
 /**
  * @api
- * @author Dmytro Demchyna <dmitry.demchina@gmail.com>
  */
 class Keeper
 {
@@ -58,35 +59,28 @@ class Keeper
      */
     public function saveDump($destinationPath)
     {
-        $this->saver->execute($destinationPath);
+        $this->saver->save($destinationPath);
     }
 
     /**
      * Compare current dump with dump previously saved in filesystem.
-     * Function returns array with keys: 'expected', 'actual'.
-     * If 'expected' != 'actual' - the current database structure is different from the saved one.
-     *
      * @param string $dumpPath Path to previously saved dump
-     * @return array
+     * @return VerifyResult
      * @throws Exception
      */
     public function verifyDump($dumpPath)
     {
-        return $this->verifier->execute($dumpPath);
+        return $this->verifier->verify($dumpPath);
     }
 
     /**
      * Deploy functions from dump previously saved in filesystem.
-     * Function returns array with keys: 'deleted', 'created', 'changed'
-     * 'deleted' - list of functions that were deleted from the current database, as they do not exist in the saved dump
-     * 'created' - list of functions that were created in the current database, as they do not exist in the saved dump
-     * 'changed' - list of functions that were changed in the current database, as their source code is different between saved dump and current database
      * @param string $dumpPath Path to previously saved dump
-     * @return array
+     * @return DeployResult
      * @throws Exception
      */
     public function deployDump($dumpPath)
     {
-        return $this->deployer->execute($dumpPath);
+        return $this->deployer->deploy($dumpPath);
     }
 }

@@ -5,10 +5,12 @@
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
 
-namespace SchemaKeeper\Exception;
+namespace SchemaKeeper\Worker;
 
-
-class DiffException extends KeeperException
+/**
+ * If getExpected() != getActual() - the current database structure is different from the saved one.
+ */
+class VerifyResult
 {
     /**
      * @var array
@@ -21,19 +23,21 @@ class DiffException extends KeeperException
     private $actual = [];
 
     /**
+     * @param array $expected
+     * @param array $actual
+     */
+    public function __construct(array $expected, array $actual)
+    {
+        $this->expected = $expected;
+        $this->actual = $actual;
+    }
+
+    /**
      * @return array
      */
     public function getExpected()
     {
         return $this->expected;
-    }
-
-    /**
-     * @param array $expected
-     */
-    public function setExpected(array $expected)
-    {
-        $this->expected = $expected;
     }
 
     /**
@@ -43,14 +47,4 @@ class DiffException extends KeeperException
     {
         return $this->actual;
     }
-
-    /**
-     * @param array $actual
-     */
-    public function setActual(array $actual)
-    {
-        $this->actual = $actual;
-    }
-
-
 }

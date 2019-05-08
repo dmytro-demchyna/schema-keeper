@@ -11,6 +11,8 @@ use Mockery\MockInterface;
 use SchemaKeeper\CLI\Runner;
 use SchemaKeeper\Keeper;
 use SchemaKeeper\Tests\SchemaTestCase;
+use SchemaKeeper\Worker\DeployResult;
+use SchemaKeeper\Worker\VerifyResult;
 
 class RunnerTest extends SchemaTestCase
 {
@@ -43,7 +45,7 @@ class RunnerTest extends SchemaTestCase
 
     function testVerify()
     {
-        $this->keeper->shouldReceive('verifyDump')->with('/tmp/dump')->once();
+        $this->keeper->shouldReceive('verifyDump')->with('/tmp/dump')->andReturn(new VerifyResult([], []))->once();
 
         $message = $this->target->run('verify', '/tmp/dump');
 
@@ -52,31 +54,23 @@ class RunnerTest extends SchemaTestCase
 
     function testDeploy()
     {
-        $this->keeper->shouldReceive('deployDump')->with('/tmp/dump')->andReturn([
-            'created' => ['1', '11'],
-            'changed' => ['2'],
-            'deleted' => ['3'],
-        ])->once();
+        $this->keeper->shouldReceive('deployDump')->with('/tmp/dump')->andReturn(new DeployResult(['2'], ['1', '11'], ['3']))
+            ->once();
 
         $message = $this->target->run('deploy', '/tmp/dump');
 
-        self::assertEquals("Dump deployed /tmp/dump.\nDeleted 3\nCreated 1\nCreated 11\nChanged 2\n", $message);
+        self::assertEquals("Dump deployed /tmp/dump\nDeleted 3\nCreated 1\nCreated 11\nChanged 2", $message);
     }
 
     /**
      * @expectedException \SchemaKeeper\Exception\KeeperException
-     * @expectedExceptionMessage Dump and current database not equals: {"expected":"1","actual":"2"}
+     * @expectedExceptionMessage Dump and current database not equals: {"expected":["1"],"actual":["2"]}
      */
     function testVerifyNotEquals()
     {
-        $this->keeper->shouldReceive('verifyDump')->with('/tmp/dump')->andReturn([
-            'expected' => '1',
-            'actual' => '2',
-        ])->once();
+        $this->keeper->shouldReceive('verifyDump')->with('/tmp/dump')->andReturn(new VerifyResult(['1'], ['2']))->once();
 
-        $message = $this->target->run('verify', '/tmp/dump');
-
-        self::assertEquals('Dump verified /tmp/dump', $message);
+        $this->target->run('verify', '/tmp/dump');
     }
 
     /**

@@ -20,19 +20,25 @@ class ShellEntryPointTest extends SchemaTestCase
 
     function testOk()
     {
-        $output = shell_exec('/data/bin/schemakeeper -c /data/.dev/cli-config.php -d /tmp/dump save');
+        exec('/data/bin/schemakeeper -c /data/.dev/cli-config.php -d /tmp/dump save', $output, $status);
+        $output = implode($output);
         self::assertEquals('Dump saved to /tmp/dump', $output);
-
-        $output = shell_exec('/data/bin/schemakeeper -c /data/.dev/cli-config.php -d /tmp/dump verify');
-        self::assertEquals('Dump verified /tmp/dump', $output);
-
-        $output = shell_exec('/data/bin/schemakeeper -c /data/.dev/cli-config.php -d /tmp/dump deploy');
-        self::assertEquals("Dump deployed /tmp/dump.\n", $output);
+        self::assertSame(0, $status);
     }
 
     function testHelp()
     {
-        $output = shell_exec('/data/bin/schemakeeper --help');
+        exec('/data/bin/schemakeeper --help', $output, $status);
+        $output = implode($output);
         self::assertContains('Usage: schemakeeper [options] <command>', $output);
+        self::assertSame(0, $status);
+    }
+
+    function testError()
+    {
+        exec('/data/bin/schemakeeper -c /data/.dev/cli-config.php -d /tmp/dump verify', $output, $status);
+        $output = implode($output);
+        self::assertContains('Dump and current database not equals', $output);
+        self::assertSame(1, $status);
     }
 }

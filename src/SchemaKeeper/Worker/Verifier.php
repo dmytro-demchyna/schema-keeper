@@ -53,15 +53,17 @@ class Verifier
 
     /**
      * @param string $sourcePath
-     * @return array
+     * @return VerifyResult
      * @throws Exception
      */
-    public function execute($sourcePath)
+    public function verify($sourcePath)
     {
         $actual = $this->dumper->dump();
         $expected = $this->dumpReader->read($sourcePath);
 
-        $result = $this->comparator->compare($expected, $actual);
+        $comparisonResult = $this->comparator->compare($expected, $actual);
+
+        $result = new VerifyResult($comparisonResult['expected'], $comparisonResult['actual']);
 
         return $result;
     }

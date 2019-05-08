@@ -48,7 +48,7 @@ abstract class SchemaTestCase extends TestCase
     protected static function getDbParams()
     {
         $dbParams = new PSQLParameters('postgres', 5432, 'schema_keeper', 'postgres', 'postgres');
-        $dbParams->setSkippedSchemaNames([
+        $dbParams->setSkippedSchemas([
             'information_schema',
             'pg_%'
         ]);
