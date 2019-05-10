@@ -6,10 +6,6 @@
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
 
-if (php_sapi_name() != 'cli') {
-    throw new \RuntimeException('Please, run this script in CLI mode');
-}
-
 $autoloadVariants = [
     __DIR__ . '/../../../autoload.php',
     __DIR__ . '/../vendor/autoload.php',
