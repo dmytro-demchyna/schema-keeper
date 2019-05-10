@@ -35,7 +35,7 @@ Available commands:
 \tverify
 \tdeploy
 ";
-            return new Result($helpMessage, 0);
+            return new Result($helpMessage, 0, STDOUT);
         }
 
         try {
@@ -53,9 +53,9 @@ Available commands:
 
             $result = $runner->run($command, $path);
 
-            return new Result($result, 0);
+            return new Result($result, 0, STDOUT);
         } catch (KeeperException $e) {
-            return new Result($e->getMessage(), 1);
+            return new Result($e->getMessage(), 1, STDERR);
         }
     }
 }

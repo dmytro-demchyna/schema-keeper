@@ -42,25 +42,18 @@ class VerifierTest extends SchemaTestCase
     public function testOk()
     {
         $this->saver->save('/tmp/schema_keeper');
-        $result = $this->target->verify('/tmp/schema_keeper');
-
-        self::assertSame($result->getExpected(), $result->getActual());
+        $this->target->verify('/tmp/schema_keeper');
     }
 
+    /**
+     * @expectedException \SchemaKeeper\Exception\NotEquals
+     * @expectedExceptionMessage Dump and current database not equals {"expected":[],"actual":{"triggers":{"public.test_table.test_trigger":"CREATE TRIGGER test_trigger BEFORE UPDATE ON test_table FOR EACH ROW EXECUTE PROCEDURE trig_test()"}}}
+     */
     public function testDiff()
     {
         $this->saver->save('/tmp/schema_keeper');
         exec('rm -r /tmp/schema_keeper/structure/public/triggers');
 
-        $result = $this->target->verify('/tmp/schema_keeper');
-
-        $triggers = [
-            'triggers' => [
-                'public.test_table.test_trigger' => 'CREATE TRIGGER test_trigger BEFORE UPDATE ON test_table FOR EACH ROW EXECUTE PROCEDURE trig_test()',
-            ],
-        ];
-
-        self::assertSame([], $result->getExpected());
-        self::assertSame($triggers, $result->getActual());
+        $this->target->verify('/tmp/schema_keeper');
     }
 }

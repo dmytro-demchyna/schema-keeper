@@ -26,11 +26,7 @@ First create the `config.php` file:
 use SchemaKeeper\Provider\PostgreSQL\PSQLParameters;
 
 $params = new PSQLParameters('localhost', 5432, 'dbname', 'username', 'password');
-
-$params->setSkippedSchemas([
-    'information_schema',
-    'pg_%'
-]);
+$params->setSkippedSchemas(['information_schema', 'pg_%']);
 
 return $params;
 ```
@@ -94,7 +90,7 @@ After calling the contents of the `/tmp/schema_keeper` will be as follows:
 $ schemakeeper -c config.php -d /tmp/schema-keeper verify
 ```
 
-The `verify` detects changes between the current database structure and saved dump. If there are no changes, `verify` will finished with exit-code 0, otherwise it will display changed objects.
+The `verify` detects changes between the current database structure and saved dump. If there are no changes, `verify` will finished with exit-code 0, otherwise &mdash; with exit-code 1 and information about changed objects.
 
 ### deploy
 
@@ -102,8 +98,11 @@ The `verify` detects changes between the current database structure and saved du
 $ schemakeeper -c config.php -d /tmp/schema-keeper deploy
 ```
 
-The `deploy` automatically deploys changes in stored procedures to the actual database in accordance with the saved dump. It works exclusively with stored procedures. Other changes in the database structure must be deployed in the classical way - through migration files.
+The `deploy` automatically deploys changes in stored procedures to the actual database in accordance with the saved dump and print names of affected functions. If deployment successful, `deploy` will finished with exit-code 0, otherwise it will display changed objects.
 
+You can change a source code of stored procedures directly in dump files and then deploy changes to your database.
+
+The `deploy` works exclusively with stored procedures. Other changes in the database structure must be deployed in the classical way &mdash; through migration files.
 
 ## Extended usage
 
@@ -147,17 +146,15 @@ class SchemaTest extends \PHPUnit\Framework\TestCase
     {
         // Initialize $keeper here...
         
-        $result = $keeper->verifyDump('/path_to_dump');
-
-        if ($result->getExpected() !== $result->getActual()) {
-            $expectedFormatted = print_r($result->getExpected(), true);
-            $actualFormatted = print_r($result->getActual(), true);
+        try {
+            $keeper->verifyDump('/path_to_dump');
+        } catch (\SchemaKeeper\Exception\NotEquals $e) {
+            $expectedFormatted = print_r($e->getExpected(), true);
+            $actualFormatted = print_r($e->getActual(), true);
 
             // assertEquals will show the detailed diff between the saved dump and actual database
             self::assertEquals($expectedFormatted, $actualFormatted);
         }
-
-        self::assertTrue(true);
     }
 }
 
@@ -177,17 +174,13 @@ $conn->beginTransaction();
 try {
     $result = $keeper->deployDump('/path_to_dump');
     
-    print_r($result->getDeleted()); // These functions were deleted from the current database
-    print_r($result->getCreated()); // These functions were created in the current database
-    print_r($result->getChanged()); // These functions were changed in the current database
-
-    echo "Success\n";
+    // $result->getDeleted() - these functions were deleted from the current database
+    // $result->getCreated() - these functions were created in the current database
+    // $result->getChanged() - these functions were changed in the current database
 
     $conn->commit();
 } catch (\Exception $e) {
     $conn->rollBack();
-
-    echo "$e\n";
 }
 ```
 

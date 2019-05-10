@@ -20,13 +20,20 @@ class Result
     private $status;
 
     /**
+     * @var resource
+     */
+    private $outputStream;
+
+    /**
      * @param string $message
      * @param int $status
+     * @param resource $outputStream
      */
-    public function __construct($message, $status)
+    public function __construct($message, $status, $outputStream)
     {
         $this->message = $message;
         $this->status = $status;
+        $this->outputStream = $outputStream;
     }
 
     /**
@@ -43,5 +50,13 @@ class Result
     public function getStatus()
     {
         return $this->status;
+    }
+
+    /**
+     * @return resource
+     */
+    public function getOutputStream()
+    {
+        return $this->outputStream;
     }
 }

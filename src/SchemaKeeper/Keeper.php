@@ -11,10 +11,9 @@ use Exception;
 use PDO;
 use SchemaKeeper\Provider\ProviderFactory;
 use SchemaKeeper\Worker\Deployer;
-use SchemaKeeper\Worker\DeployResult;
+use SchemaKeeper\Worker\DeployedFunctions;
 use SchemaKeeper\Worker\Saver;
 use SchemaKeeper\Worker\Verifier;
-use SchemaKeeper\Worker\VerifyResult;
 
 /**
  * @api
@@ -65,18 +64,17 @@ class Keeper
     /**
      * Compare current dump with dump previously saved in filesystem.
      * @param string $dumpPath Path to previously saved dump
-     * @return VerifyResult
      * @throws Exception
      */
     public function verifyDump($dumpPath)
     {
-        return $this->verifier->verify($dumpPath);
+        $this->verifier->verify($dumpPath);
     }
 
     /**
      * Deploy functions from dump previously saved in filesystem.
      * @param string $dumpPath Path to previously saved dump
-     * @return DeployResult
+     * @return DeployedFunctions
      * @throws Exception
      */
     public function deployDump($dumpPath)

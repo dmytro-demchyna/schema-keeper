@@ -33,8 +33,6 @@ class Runner
      */
     public function run($command, $path)
     {
-        $message = '';
-
         switch ($command) {
             case 'save':
                 $this->keeper->saveDump($path);
@@ -42,14 +40,7 @@ class Runner
 
                 break;
             case 'verify':
-                $result = $this->keeper->verifyDump($path);
-
-                if ($result->getExpected() !== $result->getActual()) {
-                    throw new KeeperException("Dump and current database not equals: " . json_encode([
-                            'expected' => $result->getExpected(),
-                            'actual' => $result->getActual(),
-                        ]));
-                }
+                $this->keeper->verifyDump($path);
 
                 $message = 'Dump verified ' . $path;
 
@@ -57,7 +48,7 @@ class Runner
             case 'deploy':
                 $result = $this->keeper->deployDump($path);
 
-                $message = 'Dump deployed ' . $path;
+                $message = '';
 
                 foreach ($result->getDeleted() as $nameDeleted) {
                     $message .= "\nDeleted $nameDeleted";
@@ -69,6 +60,13 @@ class Runner
 
                 foreach ($result->getChanged() as $nameChanged) {
                     $message .= "\nChanged $nameChanged";
+                }
+
+                if($message) {
+                    $message = 'Dump deployed ' . $path.$message;
+                }
+                else {
+                    $message = 'Nothing to deploy '.$path;
                 }
 
                 break;

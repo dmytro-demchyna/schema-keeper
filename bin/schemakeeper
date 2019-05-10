@@ -37,5 +37,5 @@ $options = getopt('c:d:', ['help']);
 $entryPoint = new \SchemaKeeper\CLI\EntryPoint();
 $result = $entryPoint->run($options, $argv);
 
-echo $result->getMessage();
+fwrite($result->getOutputStream(), $result->getMessage());
 exit($result->getStatus());

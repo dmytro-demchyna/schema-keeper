@@ -37,7 +37,7 @@ class EntryPointTest extends SchemaTestCase
         self::assertSame(0, $result->getStatus());
 
         $result = $this->target->run(['c' => '/data/.dev/cli-config.php', 'd' => '/tmp/dump'], ['deploy']);
-        self::assertEquals('Dump deployed /tmp/dump', $result->getMessage());
+        self::assertEquals('Nothing to deploy /tmp/dump', $result->getMessage());
         self::assertSame(0, $result->getStatus());
     }
 

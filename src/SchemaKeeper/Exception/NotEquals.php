@@ -5,12 +5,9 @@
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
 
-namespace SchemaKeeper\Worker;
+namespace SchemaKeeper\Exception;
 
-/**
- * If getExpected() != getActual() - the current database structure is different from the saved one.
- */
-class VerifyResult
+class NotEquals extends KeeperException
 {
     /**
      * @var array
@@ -23,11 +20,19 @@ class VerifyResult
     private $actual = [];
 
     /**
+     * @param string $message
      * @param array $expected
      * @param array $actual
      */
-    public function __construct(array $expected, array $actual)
+    public function __construct($message, array $expected, array $actual)
     {
+        $message .= ' '.json_encode([
+            'expected' => $expected,
+            'actual' => $actual,
+        ]);
+
+        parent::__construct($message);
+
         $this->expected = $expected;
         $this->actual = $actual;
     }

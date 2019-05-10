@@ -7,7 +7,7 @@
 
 namespace SchemaKeeper\Worker;
 
-class DeployResult
+class DeployedFunctions
 {
     /**
      * @var array

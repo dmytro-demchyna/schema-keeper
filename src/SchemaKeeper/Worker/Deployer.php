@@ -11,6 +11,7 @@ use Exception;
 use SchemaKeeper\Core\ArrayConverter;
 use SchemaKeeper\Core\SectionComparator;
 use SchemaKeeper\Exception\KeeperException;
+use SchemaKeeper\Exception\NotEquals;
 use SchemaKeeper\Filesystem\DumpReader;
 use SchemaKeeper\Filesystem\FilesystemHelper;
 use SchemaKeeper\Filesystem\SectionReader;
@@ -53,7 +54,7 @@ class Deployer
 
     /**
      * @param string $sourcePath
-     * @return DeployResult
+     * @return DeployedFunctions
      * @throws Exception
      */
     public function deploy($sourcePath)
@@ -107,13 +108,11 @@ class Deployer
         $comparisonResult = $this->comparator->compareSection('functions', $expectedFunctions, $actualFunctions);
 
         if ($comparisonResult['actual'] !== $comparisonResult['expected']) {
-            $list = array_merge($comparisonResult['expected']['functions'], $comparisonResult['actual']['functions']);
-            $failedNames = array_unique(array_keys($list));
-            $message = 'These functions have diff between their definitions from dump and their definitions after deploy: '.implode(', ', $failedNames);
+            $message = 'Some functions have diff between their definitions before deploy and their definitions after deploy';
 
-            throw new KeeperException($message);
+            throw new NotEquals($message, $comparisonResult['expected'], $comparisonResult['actual']);
         }
 
-        return new DeployResult(array_keys($functionsToChange), $functionNamesToCreate, $functionNamesToDelete);
+        return new DeployedFunctions(array_keys($functionsToChange), $functionNamesToCreate, $functionNamesToDelete);
     }
 }
