@@ -11,9 +11,9 @@ if (php_sapi_name() != 'cli') {
 }
 
 $autoloadVariants = [
-    __DIR__ . '/../../autoload.php',
     __DIR__ . '/../autoload.php',
     __DIR__ . '/../vendor/autoload.php',
+    __DIR__ . '/../../autoload.php',
     __DIR__ . '/vendor/autoload.php'
 ];
 
