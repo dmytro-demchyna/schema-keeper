@@ -11,10 +11,8 @@ if (php_sapi_name() != 'cli') {
 }
 
 $autoloadVariants = [
-    __DIR__ . '/../autoload.php',
+    __DIR__ . '/../../../autoload.php',
     __DIR__ . '/../vendor/autoload.php',
-    __DIR__ . '/../../autoload.php',
-    __DIR__ . '/vendor/autoload.php'
 ];
 
 $autoloadPath = null;
@@ -28,7 +26,8 @@ foreach ($autoloadVariants as $file) {
 }
 
 if (!$autoloadPath) {
-    throw new \Exception('autoload.php not found');
+    fwrite(STDERR, "Composer's vendor/autoload.php not found");
+    exit(1);
 }
 
 require_once $autoloadPath;
