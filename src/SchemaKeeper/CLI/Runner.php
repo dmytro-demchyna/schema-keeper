@@ -62,10 +62,9 @@ class Runner
                     $message .= "\nChanged $nameChanged";
                 }
 
-                if($message) {
+                if ($message) {
                     $message = 'Dump deployed ' . $path.$message;
-                }
-                else {
+                } else {
                     $message = 'Nothing to deploy '.$path;
                 }
 
