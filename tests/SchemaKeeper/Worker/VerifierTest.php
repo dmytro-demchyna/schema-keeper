@@ -7,6 +7,7 @@
 
 namespace SchemaKeeper\Tests\Worker;
 
+use SchemaKeeper\Exception\NotEquals;
 use SchemaKeeper\Provider\ProviderFactory;
 use SchemaKeeper\Tests\SchemaTestCase;
 use SchemaKeeper\Worker\Saver;
@@ -45,15 +46,29 @@ class VerifierTest extends SchemaTestCase
         $this->target->verify('/tmp/schema_keeper');
     }
 
-    /**
-     * @expectedException \SchemaKeeper\Exception\NotEquals
-     * @expectedExceptionMessage Dump and current database not equals {"expected":[],"actual":{"triggers":{"public.test_table.test_trigger":"CREATE TRIGGER test_trigger BEFORE UPDATE ON test_table FOR EACH ROW EXECUTE PROCEDURE trig_test()"}}}
-     */
     public function testDiff()
     {
         $this->saver->save('/tmp/schema_keeper');
         exec('rm -r /tmp/schema_keeper/structure/public/triggers');
 
-        $this->target->verify('/tmp/schema_keeper');
+        $catch = false;
+
+        try {
+            $this->target->verify('/tmp/schema_keeper');
+        } catch (NotEquals $e) {
+            $catch = true;
+            $expectedMessage = 'Dump and current database not equals {"expected":[],"actual":{"triggers":{"public.test_table.test_trigger":"CREATE TRIGGER test_trigger BEFORE UPDATE ON test_table FOR EACH ROW EXECUTE PROCEDURE trig_test()"}}}';
+            $expectedTriggers = [
+                'triggers' => [
+                    'public.test_table.test_trigger' => 'CREATE TRIGGER test_trigger BEFORE UPDATE ON test_table FOR EACH ROW EXECUTE PROCEDURE trig_test()',
+                ],
+            ];
+
+            self::assertEquals($expectedMessage, $e->getMessage());
+            self::assertEquals([], $e->getExpected());
+            self::assertEquals($expectedTriggers, $e->getActual());
+        }
+
+        self::assertTrue($catch);
     }
 }
