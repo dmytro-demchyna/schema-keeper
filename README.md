@@ -9,7 +9,7 @@
 Track structure of your PostgreSQL database in VCS using SchemaKeeper.
 
 SchemaKeeper provides 3 functions:
-1. `save` &mdash; saves the structure dump of database objects as separate text files to the specified folder.
+1. `save` &mdash; saves the structure dump of database objects as separate text files to the specified folder
 1. `verify` &mdash; detects changes between the current database structure and saved dump
 1. `deploy` &mdash; deploys changes in stored procedures to the actual database in accordance with the saved dump 
 
