@@ -98,11 +98,9 @@ The `verify` detects changes between the current database structure and saved du
 $ schemakeeper -c config.php -d /tmp/schema-keeper deploy
 ```
 
-The `deploy` automatically deploys changes in stored procedures to the actual database in accordance with the saved dump and print names of affected functions. If deployment successful, `deploy` will finished with exit-code 0, otherwise it will display changed objects.
+The `deploy` automatically deploys changes in stored procedures to the actual database in accordance with the saved dump and print names of affected functions. If deployment successful, it will finished with exit-code 0, otherwise &mdash; with exit-code 1 and information about error.
 
-You can change a source code of stored procedures directly in dump files and then deploy changes to your database.
-
-The `deploy` works exclusively with stored procedures. Other changes in the database structure must be deployed in the classical way &mdash; through migration files.
+You can change a source code of stored procedures directly in dump files and then deploy changes to your database. The `deploy` works exclusively with stored procedures. Other changes in the database structure must be deployed in the classical way &mdash; through migration files.
 
 ## Extended usage
 
