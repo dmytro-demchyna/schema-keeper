@@ -9,6 +9,7 @@ namespace SchemaKeeper\Filesystem;
 
 use SchemaKeeper\Core\Dump;
 use SchemaKeeper\Core\SchemaStructure;
+use SchemaKeeper\Exception\KeeperException;
 
 class DumpReader
 {
@@ -61,6 +62,10 @@ class DumpReader
             $structure->setSequences($this->sectionReader->readSection($schemaPath.'/sequences'));
 
             $schemas[] = $structure;
+        }
+
+        if (!$schemas) {
+            throw new KeeperException('Dump is empty '.$path);
         }
 
         $dump = new Dump($schemas, $extensions);

@@ -38,7 +38,7 @@ class ShellEntryPointTest extends SchemaTestCase
     {
         exec('/data/bin/schemakeeper -c /data/.dev/cli-config.php -d /tmp/dump verify 2>&1', $output, $status);
         $output = implode($output);
-        self::assertContains('Dump and current database not equals', $output);
+        self::assertContains('Dump is empty /tmp/dump', $output);
         self::assertSame(1, $status);
     }
 }

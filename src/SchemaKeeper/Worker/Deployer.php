@@ -67,15 +67,19 @@ class Deployer
         $expectedDump = $this->reader->read($structurePath);
         $expectedFunctions = $this->converter->dump2Array($expectedDump)['functions'];
 
-        if (!$expectedFunctions) {
-            throw new KeeperException('Forbidden to remove all functions using SchemaKeeper. Path: '.$sourcePath);
-        }
-
         $expectedFunctionNames = array_keys($expectedFunctions);
 
         $functionNamesToCreate = array_diff($expectedFunctionNames, $actualFunctionNames);
         $functionNamesToDelete = array_diff($actualFunctionNames, $expectedFunctionNames);
         $functionsToChange = array_diff_assoc($expectedFunctions, $functions);
+
+        if (count($functionNamesToDelete) == count($functions)
+            && count($functionNamesToDelete) > 0
+            && count($functionsToChange) == 0
+            && count($functionNamesToCreate) == 0
+        ) {
+            throw new KeeperException('Forbidden to remove all functions using SchemaKeeper');
+        }
 
         $lastExecutedName = null;
 
@@ -100,7 +104,7 @@ class Deployer
                 $this->provider->changeFunction($nameToChange, $contentToChange);
             }
         } catch (\PDOException $e) {
-            $keeperException = new KeeperException("TARGET: $lastExecutedName\n".$e->getMessage(), 0, $e);
+            $keeperException = new KeeperException("TARGET: $lastExecutedName\n" . $e->getMessage(), 0, $e);
 
             throw $keeperException;
         }

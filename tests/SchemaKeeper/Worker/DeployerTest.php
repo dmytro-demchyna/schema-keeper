@@ -237,6 +237,10 @@ $function$
      */
     public function testEmptyDump()
     {
+        $this->saver->save('/tmp/schema_keeper');
+
+        unlink('/tmp/schema_keeper/structure/public/functions/trig_test().sql');
+
         $this->target->deploy('/tmp/schema_keeper');
     }
 }

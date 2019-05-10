@@ -71,4 +71,13 @@ class VerifierTest extends SchemaTestCase
 
         self::assertTrue($catch);
     }
+
+    /**
+     * @expectedException \SchemaKeeper\Exception\KeeperException
+     * @expectedExceptionMessage Dump is empty /tmp/schema_keeper
+     */
+    function testEmptyDump()
+    {
+        $this->target->verify('/tmp/schema_keeper');
+    }
 }
