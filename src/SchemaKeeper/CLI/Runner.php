@@ -70,7 +70,7 @@ class Runner
 
                 break;
             default:
-                throw new KeeperException("Command " . $command . ' not exists');
+                throw new KeeperException('Unexpected command '.$command.'. Available commands: save, verify, deploy');
 
                 break;
         }
