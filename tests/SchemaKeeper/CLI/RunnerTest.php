@@ -63,7 +63,7 @@ class RunnerTest extends SchemaTestCase
 
     /**
      * @expectedException \SchemaKeeper\Exception\KeeperException
-     * @expectedExceptionMessage Command blabla not exists
+     * @expectedExceptionMessage Unexpected command blabla. Available commands: save, verify, deploy
      */
     function testUndefinedFunction()
     {
