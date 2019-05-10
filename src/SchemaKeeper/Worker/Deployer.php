@@ -15,6 +15,7 @@ use SchemaKeeper\Exception\NotEquals;
 use SchemaKeeper\Filesystem\DumpReader;
 use SchemaKeeper\Filesystem\FilesystemHelper;
 use SchemaKeeper\Filesystem\SectionReader;
+use SchemaKeeper\Outside\DeployedFunctions;
 use SchemaKeeper\Provider\IProvider;
 
 class Deployer

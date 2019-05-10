@@ -9,9 +9,9 @@ namespace SchemaKeeper;
 
 use Exception;
 use PDO;
+use SchemaKeeper\Outside\DeployedFunctions;
 use SchemaKeeper\Provider\ProviderFactory;
 use SchemaKeeper\Worker\Deployer;
-use SchemaKeeper\Worker\DeployedFunctions;
 use SchemaKeeper\Worker\Saver;
 use SchemaKeeper\Worker\Verifier;
 

@@ -57,7 +57,7 @@ class PSQLClientTest extends SchemaTestCase
     {
         $commands = [];
 
-        for($i = 0; $i < 502; $i++) {
+        for ($i = 0; $i < 502; $i++) {
             $commands[] =  '\qecho -n num'.$i;
         }
 

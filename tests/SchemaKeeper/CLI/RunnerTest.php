@@ -10,8 +10,8 @@ namespace SchemaKeeper\Tests\CLI;
 use Mockery\MockInterface;
 use SchemaKeeper\CLI\Runner;
 use SchemaKeeper\Keeper;
+use SchemaKeeper\Outside\DeployedFunctions;
 use SchemaKeeper\Tests\SchemaTestCase;
-use SchemaKeeper\Worker\DeployedFunctions;
 
 class RunnerTest extends SchemaTestCase
 {
