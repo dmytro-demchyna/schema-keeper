@@ -62,7 +62,6 @@ Available commands:
             }
 
             return new Result($result, 0, STDOUT);
-
         } catch (KeeperException $e) {
             return new Result($e->getMessage(), 1, STDERR);
         }
