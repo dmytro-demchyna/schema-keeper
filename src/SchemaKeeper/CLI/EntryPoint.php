@@ -51,9 +51,18 @@ Available commands:
             $keeper = new Keeper($conn, $params);
             $runner = new Runner($keeper);
 
-            $result = $runner->run($command, $path);
+            $conn->beginTransaction();
+
+            try {
+                $result = $runner->run($command, $path);
+                $conn->commit();
+            } catch (\Exception $exception) {
+                $conn->rollBack();
+                throw $exception;
+            }
 
             return new Result($result, 0, STDOUT);
+
         } catch (KeeperException $e) {
             return new Result($e->getMessage(), 1, STDERR);
         }
