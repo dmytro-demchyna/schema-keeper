@@ -57,23 +57,17 @@ class DeployerTest extends SchemaTestCase
 
     public function testOk()
     {
-        $this->saver->execute('/tmp/schema_keeper');
-        $actual = $this->target->execute('/tmp/schema_keeper');
+        $this->saver->save('/tmp/schema_keeper');
+        $result = $this->target->deploy('/tmp/schema_keeper');
 
-        $expected = [
-            'expected' => null,
-            'actual' => null,
-            'deleted' => [],
-            'created' => [],
-            'changed' => [],
-        ];
-
-        self::assertEquals($expected, $actual);
+        self::assertEquals([], $result->getChanged());
+        self::assertEquals([], $result->getCreated());
+        self::assertEquals([], $result->getDeleted());
     }
 
     public function testCreateFunction()
     {
-        $this->saver->execute('/tmp/schema_keeper');
+        $this->saver->save('/tmp/schema_keeper');
 
         $function = 'CREATE OR REPLACE FUNCTION public.func_test()
  RETURNS void
@@ -88,24 +82,20 @@ $function$
 
         file_put_contents('/tmp/schema_keeper/structure/public/functions/func_test().sql', $function);
 
-        $actual = $this->target->execute('/tmp/schema_keeper');
+        $result = $this->target->deploy('/tmp/schema_keeper');
 
-        $expected = [
-            'expected' => null,
-            'actual' => null,
-            'deleted' => [],
-            'created' => [
-                'public.func_test()'
-            ],
-            'changed' => [],
+        $created = [
+            'public.func_test()'
         ];
 
-        self::assertEquals($expected, $actual);
+        self::assertEquals([], $result->getChanged());
+        self::assertEquals($created, $result->getCreated());
+        self::assertEquals([], $result->getDeleted());
     }
 
     public function testChangeFunction()
     {
-        $this->saver->execute('/tmp/schema_keeper');
+        $this->saver->save('/tmp/schema_keeper');
 
         $function = 'CREATE OR REPLACE FUNCTION public.trig_test()
  RETURNS trigger
@@ -121,24 +111,24 @@ $function$
 
         file_put_contents('/tmp/schema_keeper/structure/public/functions/trig_test().sql', $function);
 
-        $actual = $this->target->execute('/tmp/schema_keeper');
+        $result = $this->target->deploy('/tmp/schema_keeper');
 
-        $expected = [
-            'expected' => null,
-            'actual' => null,
-            'deleted' => [],
-            'created' => [],
-            'changed' => [
-                'public.trig_test()'
-            ],
+        $changed = [
+            'public.trig_test()'
         ];
 
-        self::assertEquals($expected, $actual);
+        self::assertEquals($changed, $result->getChanged());
+        self::assertEquals([], $result->getCreated());
+        self::assertEquals([], $result->getDeleted());
     }
 
+    /**
+     * @expectedException \SchemaKeeper\Exception\KeeperException
+     * @expectedExceptionMessage Some functions have diff between their definitions before deploy and their definitions after deploy
+     */
     public function testChangeFunctionWithDiff()
     {
-        $this->saver->execute('/tmp/schema_keeper');
+        $this->saver->save('/tmp/schema_keeper');
 
         $function = 'cREATE OR REPLACE FUNCTION public.trig_test()
  RETURNS trigger
@@ -153,43 +143,12 @@ $function$
 
         file_put_contents('/tmp/schema_keeper/structure/public/functions/trig_test().sql', $function);
 
-        $actual = $this->target->execute('/tmp/schema_keeper');
-
-        $functionAfterCompilation = 'CREATE OR REPLACE FUNCTION public.trig_test()
- RETURNS trigger
- LANGUAGE plpgsql
-AS $function$
-DECLARE
-BEGIN
-   RETURN NEW;
-END;
-$function$
-';
-
-        $expected = [
-            'expected' => [
-                'functions' => [
-                    'public.trig_test()' => $function,
-                ]
-            ],
-            'actual' => [
-                'functions' => [
-                    'public.trig_test()' => $functionAfterCompilation,
-                ]
-            ],
-            'deleted' => [],
-            'created' => [],
-            'changed' => [
-                'public.trig_test()'
-            ],
-        ];
-
-        self::assertEquals($expected, $actual);
+        $this->target->deploy('/tmp/schema_keeper');
     }
 
     public function testDeleteFunction()
     {
-        $this->saver->execute('/tmp/schema_keeper');
+        $this->saver->save('/tmp/schema_keeper');
 
         $function = 'CREATE OR REPLACE FUNCTION public.func_test()
  RETURNS void
@@ -204,19 +163,15 @@ $function$
 
         $this->conn->exec($function);
 
-        $actual = $this->target->execute('/tmp/schema_keeper');
+        $result = $this->target->deploy('/tmp/schema_keeper');
 
-        $expected = [
-            'expected' => null,
-            'actual' => null,
-            'deleted' => [
-                'public.func_test()'
-            ],
-            'created' => [],
-            'changed' => [],
+        $deleted = [
+            'public.func_test()'
         ];
 
-        self::assertEquals($expected, $actual);
+        self::assertEquals([], $result->getChanged());
+        self::assertEquals([], $result->getCreated());
+        self::assertEquals($deleted, $result->getDeleted());
     }
 
     public function testChangeFunctionReturnType()
@@ -234,7 +189,7 @@ $function$
 
         $this->conn->exec($function);
 
-        $this->saver->execute('/tmp/schema_keeper');
+        $this->saver->save('/tmp/schema_keeper');
 
         $changedFunction = 'CREATE OR REPLACE FUNCTION public.func_test()
  RETURNS boolean
@@ -249,19 +204,16 @@ $function$
 
         file_put_contents('/tmp/schema_keeper/structure/public/functions/func_test().sql', $changedFunction);
 
-        $actual = $this->target->execute('/tmp/schema_keeper');
+        $result = $this->target->deploy('/tmp/schema_keeper');
 
-        $expected = [
-            'expected' => null,
-            'actual' => null,
-            'deleted' => [],
-            'created' => [],
-            'changed' => [
+        $changed =
+            [
                 'public.func_test()'
-            ],
-        ];
+            ];
 
-        self::assertEquals($expected, $actual);
+        self::assertEquals($changed, $result->getChanged());
+        self::assertEquals([], $result->getCreated());
+        self::assertEquals([], $result->getDeleted());
     }
 
     /**
@@ -270,13 +222,13 @@ $function$
      */
     public function testError()
     {
-        $this->saver->execute('/tmp/schema_keeper');
+        $this->saver->save('/tmp/schema_keeper');
 
         $function = 'fd';
 
         file_put_contents('/tmp/schema_keeper/structure/public/functions/trig_test().sql', $function);
 
-        $this->target->execute('/tmp/schema_keeper');
+        $this->target->deploy('/tmp/schema_keeper');
     }
 
     /**
@@ -285,6 +237,6 @@ $function$
      */
     public function testEmptyDump()
     {
-        $this->target->execute('/tmp/schema_keeper');
+        $this->target->deploy('/tmp/schema_keeper');
     }
 }

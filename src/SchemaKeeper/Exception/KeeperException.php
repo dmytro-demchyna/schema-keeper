@@ -7,6 +7,6 @@
 
 namespace SchemaKeeper\Exception;
 
-class KeeperException extends \Exception
+class KeeperException extends \RuntimeException
 {
 }

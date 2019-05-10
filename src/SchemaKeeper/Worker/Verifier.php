@@ -13,6 +13,7 @@ use SchemaKeeper\Core\DumpComparator;
 use SchemaKeeper\Core\Dumper;
 use SchemaKeeper\Core\SchemaFilter;
 use SchemaKeeper\Core\SectionComparator;
+use SchemaKeeper\Exception\NotEquals;
 use SchemaKeeper\Filesystem\DumpReader;
 use SchemaKeeper\Filesystem\FilesystemHelper;
 use SchemaKeeper\Filesystem\SectionReader;
@@ -53,16 +54,17 @@ class Verifier
 
     /**
      * @param string $sourcePath
-     * @return array
      * @throws Exception
      */
-    public function execute($sourcePath)
+    public function verify($sourcePath)
     {
         $actual = $this->dumper->dump();
         $expected = $this->dumpReader->read($sourcePath);
 
-        $result = $this->comparator->compare($expected, $actual);
+        $comparisonResult = $this->comparator->compare($expected, $actual);
 
-        return $result;
+        if ($comparisonResult['expected'] !== $comparisonResult['actual']) {
+            throw new NotEquals('Dump and current database not equals', $comparisonResult['expected'], $comparisonResult['actual']);
+        }
     }
 }

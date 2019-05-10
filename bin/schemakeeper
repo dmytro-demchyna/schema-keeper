@@ -1,0 +1,41 @@
+#!/usr/bin/env php
+<?php
+/**
+ * This file is part of the SchemaKeeper package.
+ * (c) Dmytro Demchyna <dmitry.demchina@gmail.com>
+ * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
+ */
+
+if (php_sapi_name() != 'cli') {
+    throw new \RuntimeException('Please, run this script in CLI mode');
+}
+
+$autoloadVariants = [
+    __DIR__ . '/../../autoload.php',
+    __DIR__ . '/../vendor/autoload.php',
+    __DIR__ . '/vendor/autoload.php'
+];
+
+$autoloadPath = null;
+
+foreach ($autoloadVariants as $file) {
+    if (file_exists($file)) {
+        $autoloadPath = $file;
+
+        break;
+    }
+}
+
+if (!$autoloadPath) {
+    throw new \Exception('autoload.php not found');
+}
+
+require_once $autoloadPath;
+
+$options = getopt('c:d:', ['help']);
+
+$entryPoint = new \SchemaKeeper\CLI\EntryPoint();
+$result = $entryPoint->run($options, $argv);
+
+fwrite($result->getOutputStream(), $result->getMessage());
+exit($result->getStatus());

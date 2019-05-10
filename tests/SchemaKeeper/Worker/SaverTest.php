@@ -34,7 +34,7 @@ class SaverTest extends SchemaTestCase
 
     public function testOk()
     {
-        $this->target->execute('/tmp/schema_keeper');
+        $this->target->save('/tmp/schema_keeper');
 
         self::assertEquals([
             '/tmp/schema_keeper/extensions',

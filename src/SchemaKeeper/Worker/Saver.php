@@ -43,7 +43,7 @@ class Saver
      * @param string $destinationPath
      * @throws Exception
      */
-    public function execute($destinationPath)
+    public function save($destinationPath)
     {
         $dump = $this->dumper->dump();
         $this->writer->write($destinationPath, $dump);

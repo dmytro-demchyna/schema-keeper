@@ -35,6 +35,7 @@ class DumpReader
     /**
      * @param string $path
      * @return Dump
+     * @throws \Exception
      */
     public function read($path)
     {

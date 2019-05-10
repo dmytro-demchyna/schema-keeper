@@ -41,7 +41,7 @@ class PSQLClientTest extends SchemaTestCase
         self::assertEquals($expected, $actual);
     }
 
-    public function testMultipleCommandOk()
+    public function testMultipleCommands()
     {
         $expected = [
             "12345",
@@ -51,6 +51,20 @@ class PSQLClientTest extends SchemaTestCase
         $actual = $this->target->runMultiple(["\qecho -n 12345", "\qecho -n 54321"]);
 
         self::assertEquals($expected, $actual);
+    }
+
+    public function testBatchCommands()
+    {
+        $commands = [];
+
+        for ($i = 0; $i < 502; $i++) {
+            $commands[] =  '\qecho -n num'.$i;
+        }
+
+        $actual = $this->target->runMultiple($commands);
+
+        self::assertCount(502, $actual);
+        self::assertEquals('num501', $actual[501]);
     }
 
     public function testEmptyCommands()

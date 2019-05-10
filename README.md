@@ -6,45 +6,54 @@
 [![Build Status](https://img.shields.io/travis/com/dmytro-demchyna/schema-keeper/master.svg)](https://travis-ci.com/dmytro-demchyna/schema-keeper)
 [![Coverage](https://img.shields.io/codecov/c/github/dmytro-demchyna/schema-keeper/master.svg)](https://codecov.io/gh/dmytro-demchyna/schema-keeper)
 
-Please, read [wiki](https://github.com/dmytro-demchyna/schema-keeper/wiki/Database-continuous-integration-using-SchemaKeeper) to better understand SchemaKeeper goals.
+Track structure of your PostgreSQL database in VCS using SchemaKeeper.
+
+SchemaKeeper provides 3 functions:
+1. `save` &mdash; saves the structure dump of database objects as separate text files to the specified folder
+1. `verify` &mdash; detects changes between the current database structure and saved dump
+1. `deploy` &mdash; deploys changes in stored procedures to the actual database in accordance with the saved dump 
+
+You can find more information about SchemaKeeper's workflow in the [wiki](https://github.com/dmytro-demchyna/schema-keeper/wiki/Database-continuous-integration-using-SchemaKeeper).
 
 ## Installation
 
-```
+```bash
 $ composer require schema-keeper/schema-keeper
 ```
 
-## Specification
-SchemaKeeper  provides 3 functions:
+> You must install [psql](https://www.postgresql.org/docs/current/app-psql.html) on the machines where SchemaKeeper will be used.
+
+## Basic Usage
+
+Create the `config.php` file:
 
 ```php
 <?php
 
-$keeper->saveDump('path_to_dump');
-$keeper->verifyDump('path_to_dump');
-$keeper->deployDump('path_to_dump');
+use SchemaKeeper\Provider\PostgreSQL\PSQLParameters;
+
+$params = new PSQLParameters('localhost', 5432, 'dbname', 'username', 'password');
+$params->setSkippedSchemas(['information_schema', 'pg_%']);
+
+return $params;
 ```
 
-### saveDump
-`saveDump` writes a dump of the current database to the specified folder. For example, after calling 
+Now you can interact with `schemakeeper` binary.
 
-```php
-<?php
+### save
 
-$keeper->saveDump('/tmp/schema_keeper');
+```bash
+$ schemakeeper -c config.php -d /tmp/schema-keeper save
 ```
- 
-the contents of the `/tmp/schema_keeper` folder will be as follows:
+
+The contents of the `/tmp/schema_keeper` (after calling `save`) will be as follows:
 
 ```
 /tmp/schema_keeper:
-    extensions:
-        plpgsql.txt
-        ...
     structure:
         public:
             functions:
-                func1.sql
+                auth(int8).sql
                 ...
             materialized_views:
                 mat_view1.txt
@@ -53,7 +62,7 @@ the contents of the `/tmp/schema_keeper` folder will be as follows:
                 sequence1.txt
                 ...
             tables:
-                table1.txt
+                accounts.txt
                 ...
             triggers:
                 trigger1.sql
@@ -64,110 +73,71 @@ the contents of the `/tmp/schema_keeper` folder will be as follows:
             views:
                 view1.txt
                 ...
-        another_schema:
-            tables:
-                table3.txt
+        booking:
+            views:
+                tariffs.txt
                 ...
-            sequences:
-                sequence3.txt
-                ...
+        ...
+    extensions:
+        plpgsql.txt
         ...
 ```
 
-### verifyDump
-`verifyDump` checks whether the database structure has changed after the dump has been saved. 
+As a result, we have a directory, containing database structure, divided into grouped files that are easy to add to the VCS.
 
-For example:
-```php
-<?php
+Examples of conversion objects to files:
 
-$result = $keeper->verifyDump('/path_to_dump');
+Object type         | Schema         | Name                                     | Relative file path
+--------------------|----------------|------------------------------------------|--------------------------------------------
+Table               | public         | accounts                                 | ./public/tables/accounts.txt
+Stored procedure    | public         | auth(hash bigint)                        | ./public/functions/auth(int8).sql
+View                | booking        | tariffs                                  | ./booking/views/tariffs.txt
 
-if ($result['expected'] !== $result['actual']) {
-    echo 'There are changes...';
-}
+As can be seen from the table above, the path to the file stores information about the type, scheme and name of the object. This approach makes easier navigation through the dump, as well as code review of changes.
+
+File content is a textual representation of the structure of the specific database object. For example, the contents of a file for stored procedure will be it's complete definition, starting with the `CREATE OR REPLACE FUNCTION` block.
+
+### verify
+
+```bash
+$ schemakeeper -c config.php -d /tmp/schema-keeper verify
 ```
 
-You can wrap `verifyDump` into the PHPUnit test:
+Having the saved dump of the current database structure, we are able to check whether changes have been made to the database structure after creating the dump.
 
-```php
-<?php
+If there are no changes, `verify` will finished with exit-code 0, otherwise &mdash; with exit-code 1 and print information about changed objects.
 
-class SchemaTest extends \PHPUnit\Framework\TestCase
-{
-    function testOk()
-    {
-        // Initialize $keeper here...
-        
-        $result = $keeper->verifyDump('/path_to_dump');
+An alternative way to check is to call the `save` again, specifying the same directory, and check for changes in the VCS. Since the objects from the database are stored in separate files, the VCS will show only the changed objects. The main disadvantage of this method is the need to overwrite files to see the changes.
 
-        if ($result['expected'] !== $result['actual']) {
-            $expectedFormatted = print_r($result['expected'], true);
-            $actualFormatted = print_r($result['actual'], true);
+### deploy
 
-            // assertEquals will show the detailed diff between the saved dump and actual database
-            self::assertEquals($expectedFormatted, $actualFormatted);
-        }
-
-        self::assertTrue(true);
-    }
-}
-
+```bash
+$ schemakeeper -c config.php -d /tmp/schema-keeper deploy
 ```
 
-### deployDump
+If deployment successful, command will finished with exit-code 0 and print names of affected functions, otherwise &mdash; with exit-code 1 and print information about error.
 
-The `deployDump` function automatically deploys changes in stored procedures to the actual database in accordance with the saved dump. 
+> The `deploy` is designed to work with stored procedures written in [PL/pgSQL](https://www.postgresql.org/docs/current/plpgsql.html). Using with other languages may be less effective or impossible.
 
-Example:
+You can edit source code of stored procedures in the same way as the rest of the application source code using the `deploy`. Modification of the stored procedure occurs by making changes to the corresponding file, which is automatically reflected in the version control system.
 
-```php
-<?php
+For example, to create a new stored procedure in the `public` schema, just create a new file with the `.sql` extension in the `public/functions` directory, place the source code of the stored procedure in it, including the `CREATE OR REPLACE FUNCTION` block, then call the `deploy`. Similarly occur changes or removal of the stored procedure. Thus, the code simultaneously enters both the VCS and the database.
 
-// Initialize $keeper here...
+> When creating a new stored procedure, there is no need to manually enter the correct file name. It is enough that the file has the extension `.sql`. The correct name can be obtained from output of the `deploy`, and used to rename the file.
 
-$result = $keeper->deployDump('/path_to_dump');
+The `deploy` changes the parameters of the function or the return type without additional actions, while with the classical approach it would be necessary to first perform `DROP FUNCTION`, and only then `CREATE OR REPLACE FUNCTION`.
 
-print_r($result['deleted']); // These functions were deleted from the current database
-print_r($result['created']); // These functions were created in the current database
-print_r($result['changed']); // These functions were changed in the current database
+If an error appears in the source code of the stored procedure, the `deploy` fails, displaying an error. The divergence between the dump and the current database for stored procedures is not possible if you use `deploy` on a permanent basis.
 
-if($result['expected'] !== $result['actual']) {
-    throw new \Exception('Deploy failure');
-}
-```
+Unfortunately, in some situations `deploy` is not able to automatically apply changes. For example, if you try to delete trigger function, that is used by at least one trigger. Such situations are solved manually with the help of migration files.
 
-You can wrap `deployDump` into transaction block:
+If the `deploy` is responsible for transferring changes in stored procedures, then the migration files are used to transfer the remaining changes in the structure. For example, [doctrine/migrations](https://packagist.org/packages/doctrine/migrations) will do.
 
-```php
+Migrations must be applied before `deploy` starts to make changes to the structure and resolve possible problem situations.
 
-// Initialize $conn and $dbParams here...
+## Extended usage
 
-$keeper = new Keeper($conn, $dbParams);
-
-$conn->beginTransaction();
-
-try {
-    $result = $keeper->deployDump('/path_to_dump');
-
-    if($result['expected'] !== $result['actual']) {
-        throw new \Exception('Deploy failure');
-    }
-
-    echo "Success\n";
-
-    $conn->commit();
-} catch (\Exception $e) {
-    $conn->rollBack();
-
-    echo "$e\n";
-}
-```
-
-The `deployDump` works exclusively with stored procedures. Other changes in the database structure must be deployed in the classical way - through migrations.
-
-## Configuration
-> You must install `postgresql-client` on the machines where SchemaKeeper will be used, since the [psql](https://www.postgresql.org/docs/current/app-psql.html) is used to interact with the database in some cases.
+You can inject SchemaKeeper to your own code.
 
 ```php
 <?php
@@ -186,6 +156,63 @@ $conn = new PDO($dsn, $user, $password, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEP
 
 $params = new PSQLParameters($host, $port, $dbName, $user, $password);
 $keeper = new Keeper($conn, $params);
+```
+
+```php
+<?php
+
+$keeper->saveDump('path_to_dump');
+$keeper->verifyDump('path_to_dump');
+$keeper->deployDump('path_to_dump');
+```
+
+You can wrap `verifyDump` into the PHPUnit test:
+
+```php
+<?php
+
+class SchemaTest extends \PHPUnit\Framework\TestCase
+{
+    function testOk()
+    {
+        // Initialize $keeper here...
+        
+        try {
+            $keeper->verifyDump('/path_to_dump');
+        } catch (\SchemaKeeper\Exception\NotEquals $e) {
+            $expectedFormatted = print_r($e->getExpected(), true);
+            $actualFormatted = print_r($e->getActual(), true);
+
+            // assertEquals will show the detailed diff between the saved dump and actual database
+            self::assertEquals($expectedFormatted, $actualFormatted);
+        }
+    }
+}
+
+```
+
+You can wrap `deployDump` into transaction block:
+
+```php
+<?php
+
+// Initialize $conn and $dbParams here...
+
+$keeper = new \SchemaKeeper\Keeper($conn, $dbParams);
+
+$conn->beginTransaction();
+
+try {
+    $result = $keeper->deployDump('/path_to_dump');
+    
+    // $result->getDeleted() - these functions were deleted from the current database
+    // $result->getCreated() - these functions were created in the current database
+    // $result->getChanged() - these functions were changed in the current database
+
+    $conn->commit();
+} catch (\Exception $e) {
+    $conn->rollBack();
+}
 ```
 
 ## Contributing

@@ -48,5 +48,6 @@
   },
   "suggest": {
     "doctrine/migrations": ""
-  }
+  },
+  "bin": ["bin/schemakeeper"]
 }

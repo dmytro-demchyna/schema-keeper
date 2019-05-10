@@ -11,9 +11,11 @@ use Exception;
 use SchemaKeeper\Core\ArrayConverter;
 use SchemaKeeper\Core\SectionComparator;
 use SchemaKeeper\Exception\KeeperException;
+use SchemaKeeper\Exception\NotEquals;
 use SchemaKeeper\Filesystem\DumpReader;
 use SchemaKeeper\Filesystem\FilesystemHelper;
 use SchemaKeeper\Filesystem\SectionReader;
+use SchemaKeeper\Outside\DeployedFunctions;
 use SchemaKeeper\Provider\IProvider;
 
 class Deployer
@@ -53,10 +55,10 @@ class Deployer
 
     /**
      * @param string $sourcePath
-     * @return array
+     * @return DeployedFunctions
      * @throws Exception
      */
-    public function execute($sourcePath)
+    public function deploy($sourcePath)
     {
         $functions = $this->provider->getFunctions();
         $actualFunctionNames = array_keys($functions);
@@ -66,7 +68,7 @@ class Deployer
         $expectedFunctions = $this->converter->dump2Array($expectedDump)['functions'];
 
         if (!$expectedFunctions) {
-            throw new KeeperException('Forbidden to remove all functions using SchemaKeeper');
+            throw new KeeperException('Forbidden to remove all functions using SchemaKeeper. Path: '.$sourcePath);
         }
 
         $expectedFunctionNames = array_keys($expectedFunctions);
@@ -106,12 +108,12 @@ class Deployer
         $actualFunctions = $this->provider->getFunctions();
         $comparisonResult = $this->comparator->compareSection('functions', $expectedFunctions, $actualFunctions);
 
-        return [
-            'expected' => $comparisonResult['expected'],
-            'actual' => $comparisonResult['actual'],
-            'deleted' => $functionNamesToDelete,
-            'created' => $functionNamesToCreate,
-            'changed' => array_keys($functionsToChange),
-        ];
+        if ($comparisonResult['actual'] !== $comparisonResult['expected']) {
+            $message = 'Some functions have diff between their definitions before deploy and their definitions after deploy';
+
+            throw new NotEquals($message, $comparisonResult['expected'], $comparisonResult['actual']);
+        }
+
+        return new DeployedFunctions(array_keys($functionsToChange), $functionNamesToCreate, $functionNamesToDelete);
     }
 }

@@ -104,7 +104,7 @@ class PSQLParameters
     /**
      * @return array
      */
-    public function getSkippedSchemaNames()
+    public function getSkippedSchemas()
     {
         return $this->skippedSchemaNames;
     }
@@ -112,7 +112,7 @@ class PSQLParameters
     /**
      * @param array $skippedSchemaNames
      */
-    public function setSkippedSchemaNames(array $skippedSchemaNames)
+    public function setSkippedSchemas(array $skippedSchemaNames)
     {
         $this->skippedSchemaNames = $skippedSchemaNames;
     }
@@ -120,7 +120,7 @@ class PSQLParameters
     /**
      * @return array
      */
-    public function getSkippedExtensionNames()
+    public function getSkippedExtensions()
     {
         return $this->skippedExtensionNames;
     }
@@ -128,7 +128,7 @@ class PSQLParameters
     /**
      * @param array $skippedExtensionNames
      */
-    public function setSkippedExtensionNames(array $skippedExtensionNames)
+    public function setSkippedExtensions(array $skippedExtensionNames)
     {
         $this->skippedExtensionNames = $skippedExtensionNames;
     }
