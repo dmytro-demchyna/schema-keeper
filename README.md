@@ -6,6 +6,8 @@
 [![Build Status](https://img.shields.io/travis/com/dmytro-demchyna/schema-keeper/master.svg)](https://travis-ci.com/dmytro-demchyna/schema-keeper)
 [![Coverage](https://img.shields.io/codecov/c/github/dmytro-demchyna/schema-keeper/master.svg)](https://codecov.io/gh/dmytro-demchyna/schema-keeper)
 
+SchemaKeeper is a set of database continuous integration tools.
+
 Please, read [wiki](https://github.com/dmytro-demchyna/schema-keeper/wiki/Database-continuous-integration-using-SchemaKeeper) to better understand SchemaKeeper goals.
 
 ## Installation
@@ -42,7 +44,7 @@ SchemaKeeper's binary provides 3 functions:
 $ schemakeeper -c config.php -d /tmp/schema-keeper save
 ```
 
-The `save` writes a dump of the current database to the specified folder. 
+The `save` saves the structure of database objects as separate text files to the specified folder.
  
 After calling the contents of the `/tmp/schema_keeper` will be as follows:
 
@@ -83,6 +85,8 @@ After calling the contents of the `/tmp/schema_keeper` will be as follows:
                 ...
         ...
 ```
+
+File content is a textual representation of the structure of the specific database object. For example, the contents of a file for stored procedure will be it's complete definition, starting with the `CREATE OR REPLACE FUNCTION` block.
 
 ### verify
 
