@@ -49,5 +49,12 @@
   "suggest": {
     "doctrine/migrations": ""
   },
-  "bin": ["bin/schemakeeper"]
+  "bin": [
+    "bin/schemakeeper"
+  ],
+  "extra": {
+    "branch-alias": {
+      "dev-master": "2.0-dev"
+    }
+  }
 }
