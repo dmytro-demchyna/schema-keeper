@@ -48,10 +48,34 @@ class EntryPointTest extends SchemaTestCase
         self::assertSame(0, $result->getStatus());
     }
 
-    function testError()
+    function testVersion()
+    {
+        $result = $this->target->run(['version' => 0], []);
+        self::assertEquals(
+            'SchemaKeeper ' . EntryPoint::VERSION . ' by Dmytro Demchyna and contributors' . PHP_EOL,
+            $result->getMessage()
+        );
+        self::assertSame(0, $result->getStatus());
+    }
+
+    function testConfigError()
     {
         $result = $this->target->run([], []);
         self::assertEquals('Config file not found or not readable ', $result->getMessage());
+        self::assertSame(1, $result->getStatus());
+    }
+
+    function testUnrecognizedCommand()
+    {
+        $result = $this->target->run(['c' => '/data/.dev/cli-config.php', 'd' => '/tmp/dump'], ['blabla']);
+        self::assertEquals('Unexpected command blabla. Available commands: save, verify, deploy', $result->getMessage());
+        self::assertSame(1, $result->getStatus());
+    }
+
+    function testUnrecognizedOption()
+    {
+        $result = $this->target->run(['blabla' => 0], []);
+        self::assertEquals('Unrecognized option: blabla', $result->getMessage());
         self::assertSame(1, $result->getStatus());
     }
 }

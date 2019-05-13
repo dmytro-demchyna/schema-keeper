@@ -23,6 +23,12 @@ class EntryPoint
      */
     public function run(array $options, array $argv)
     {
+        foreach ($options as $optionName => $optionValue) {
+            if (!in_array($optionName, ['c', 'd', 'help', 'version'])) {
+                return new Result('Unrecognized option: '.$optionName, 1, STDERR);
+            }
+        }
+
         if (isset($options['help'])) {
             $helpMessage = "Usage: schemakeeper [options] <command>" . PHP_EOL . PHP_EOL .
                 'Example: schemakeeper -c /path_to_config.php -d /path_to_dump save' . PHP_EOL . PHP_EOL
