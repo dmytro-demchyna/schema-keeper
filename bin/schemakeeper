@@ -28,7 +28,7 @@ if (!$autoloadPath) {
 
 require_once $autoloadPath;
 
-$options = getopt('c:d:', ['help']);
+$options = getopt('c:d:', ['help', 'version']);
 
 $entryPoint = new \SchemaKeeper\CLI\EntryPoint();
 $result = $entryPoint->run($options, $argv);

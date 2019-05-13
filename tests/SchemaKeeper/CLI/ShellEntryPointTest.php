@@ -7,6 +7,7 @@
 
 namespace SchemaKeeper\Tests\CLI;
 
+use SchemaKeeper\CLI\EntryPoint;
 use SchemaKeeper\Tests\SchemaTestCase;
 
 class ShellEntryPointTest extends SchemaTestCase
@@ -31,6 +32,16 @@ class ShellEntryPointTest extends SchemaTestCase
         exec('/data/bin/schemakeeper --help', $output, $status);
         $output = implode($output);
         self::assertContains('Usage: schemakeeper [options] <command>', $output);
+        self::assertSame(0, $status);
+    }
+
+    function testVersion()
+    {
+        exec('/data/bin/schemakeeper --version', $output, $status);
+        $output = implode($output);
+
+        $expected = 'SchemaKeeper '.EntryPoint::VERSION.' by Dmytro Demchyna and contributors';
+        self::assertEquals($expected, $output);
         self::assertSame(0, $status);
     }
 

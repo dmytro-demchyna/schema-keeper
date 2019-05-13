@@ -104,7 +104,7 @@ class Deployer
                 $this->provider->changeFunction($nameToChange, $contentToChange);
             }
         } catch (\PDOException $e) {
-            $keeperException = new KeeperException("TARGET: $lastExecutedName\n" . $e->getMessage(), 0, $e);
+            $keeperException = new KeeperException("TARGET: $lastExecutedName; " . $e->getMessage(), 0, $e);
 
             throw $keeperException;
         }

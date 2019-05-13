@@ -51,26 +51,26 @@ class Runner
                 $message = '';
 
                 foreach ($result->getDeleted() as $nameDeleted) {
-                    $message .= "\nDeleted $nameDeleted";
+                    $message .= PHP_EOL . "Deleted $nameDeleted";
                 }
 
                 foreach ($result->getCreated() as $nameCreated) {
-                    $message .= "\nCreated $nameCreated";
+                    $message .= PHP_EOL . "Created $nameCreated";
                 }
 
                 foreach ($result->getChanged() as $nameChanged) {
-                    $message .= "\nChanged $nameChanged";
+                    $message .= PHP_EOL . "Changed $nameChanged";
                 }
 
                 if ($message) {
-                    $message = 'Dump deployed ' . $path.$message;
+                    $message = 'Dump deployed ' . $path . $message;
                 } else {
-                    $message = 'Nothing to deploy '.$path;
+                    $message = 'Nothing to deploy ' . $path;
                 }
 
                 break;
             default:
-                throw new KeeperException('Unexpected command '.$command.'. Available commands: save, verify, deploy');
+                throw new KeeperException('Unexpected command ' . $command . '. Available commands: save, verify, deploy');
 
                 break;
         }
