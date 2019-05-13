@@ -17,11 +17,14 @@ You can find more information about SchemaKeeper's workflow in the [wiki](https:
 
 ## Installation
 
+> OS Windows is currently not supported.
+
+> You must install [psql](https://www.postgresql.org/docs/current/app-psql.html) on the machines where SchemaKeeper will be used.
+
+### Composer
 ```bash
 $ composer require schema-keeper/schema-keeper
 ```
-
-> You must install [psql](https://www.postgresql.org/docs/current/app-psql.html) on the machines where SchemaKeeper will be used.
 
 ## Basic Usage
 

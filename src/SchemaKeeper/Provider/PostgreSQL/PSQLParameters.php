@@ -35,6 +35,11 @@ class PSQLParameters
     private $password;
 
     /**
+     * @var string
+     */
+    private $executable = 'psql';
+
+    /**
      * @var array
      */
     private $skippedSchemaNames = [];
@@ -99,6 +104,22 @@ class PSQLParameters
     public function getPort()
     {
         return $this->port;
+    }
+
+    /**
+     * @return string
+     */
+    public function getExecutable()
+    {
+        return $this->executable;
+    }
+
+    /**
+     * @param string $executable
+     */
+    public function setExecutable($executable)
+    {
+        $this->executable = $executable;
     }
 
     /**

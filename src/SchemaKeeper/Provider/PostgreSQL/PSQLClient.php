@@ -14,6 +14,11 @@ class PSQLClient
     /**
      * @var string
      */
+    private $executable;
+
+    /**
+     * @var string
+     */
     protected $dbName;
 
     /**
@@ -37,21 +42,16 @@ class PSQLClient
     protected $password;
 
     /**
+     * @param string $executable
      * @param string $dbName
      * @param string $host
      * @param string $port
      * @param string $user
      * @param string $password
-     * @throws KeeperException
      */
-    public function __construct($dbName, $host, $port, $user, $password)
+    public function __construct($executable, $dbName, $host, $port, $user, $password)
     {
-        exec('command -v psql >/dev/null 2>&1 || exit 1', $output, $retVal);
-
-        if ($retVal !== 0) {
-            throw new KeeperException('psql not installed. Please, install "postgresql-client" package');
-        }
-
+        $this->executable = $executable;
         $this->dbName = $dbName;
         $this->host = $host;
         $this->port = $port;
@@ -68,7 +68,7 @@ class PSQLClient
     {
         $this->putPassword();
 
-        $req = "echo " . escapeshellarg($command) . " | psql -U" . $this->user . " -h" . $this->host . " -p" . $this->port . " -d" . $this->dbName;
+        $req = "echo " . escapeshellarg($command) . " | ".$this->generateScript();
 
         return shell_exec($req);
     }
@@ -106,7 +106,7 @@ class PSQLClient
             $commandsString .= ' -c ' . escapeshellarg($cmd) . ' -c ' . escapeshellarg("\qecho -n '" . $separator . "'");
         }
 
-        $req = "psql -U" . $this->user . " -h" . $this->host . " -p" . $this->port . " -d" . $this->dbName . $commandsString;
+        $req = $this->generateScript() . $commandsString;
 
         $rawOutput = shell_exec($req);
 
@@ -119,6 +119,11 @@ class PSQLClient
         }
 
         return $results;
+    }
+
+    private function generateScript()
+    {
+        return $this->executable . ' -U' . $this->user . ' -h' . $this->host . ' -p' . $this->port . ' -d' . $this->dbName;
     }
 
     private function putPassword()

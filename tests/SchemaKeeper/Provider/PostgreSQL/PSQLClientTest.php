@@ -24,6 +24,7 @@ class PSQLClientTest extends SchemaTestCase
         $dbParams = $this->getDbParams();
 
         $this->target = new PSQLClient(
+            $dbParams->getExecutable(),
             $dbParams->getDbName(),
             $dbParams->getHost(),
             $dbParams->getPort(),

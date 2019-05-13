@@ -40,4 +40,17 @@ class KeeperTest extends SchemaTestCase
 
         self::assertTrue(true);
     }
+
+    /**
+     * @expectedException \SchemaKeeper\Exception\KeeperException
+     * @expectedExceptionMessage blabla not installed. Please, install "postgresql-client" package
+     */
+    function testRequirementsCheck()
+    {
+        $conn = $this->getConn();
+        $params = $this->getDbParams();
+        $params->setExecutable('blabla');
+
+        $this->target = new Keeper($conn, $params);
+    }
 }

@@ -9,6 +9,7 @@ namespace SchemaKeeper\Provider;
 
 use PDO;
 use SchemaKeeper\Exception\KeeperException;
+use SchemaKeeper\Provider\PostgreSQL\PSQLChecker;
 use SchemaKeeper\Provider\PostgreSQL\PSQLClient;
 use SchemaKeeper\Provider\PostgreSQL\PSQLParameters;
 use SchemaKeeper\Provider\PostgreSQL\PSQLProvider;
@@ -31,7 +32,11 @@ class ProviderFactory
             throw new KeeperException('$parameters must be instance of '.PSQLParameters::class);
         }
 
+        $checker = new PSQLChecker($parameters);
+        $checker->check();
+
         $client = new PSQLClient(
+            $parameters->getExecutable(),
             $parameters->getDbName(),
             $parameters->getHost(),
             $parameters->getPort(),
