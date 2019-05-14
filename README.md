@@ -86,15 +86,13 @@ After calling `save` we will get a directory, containing database structure, div
         ...
 ```
 
-File content is a textual representation of the structure of the every database object. For example, the contents of `public/functions/auth(int8).sql` is the complete definition of stored procedure, starting with the `CREATE OR REPLACE FUNCTION` block.
+Examples of conversion to files:
 
-Examples of conversion objects to files:
-
-Object type         | Schema         | Name                                     | Relative file path
---------------------|----------------|------------------------------------------|--------------------------------------------
-Table               | public         | accounts                                 | ./public/tables/accounts.txt
-Stored procedure    | public         | auth(hash bigint)                        | ./public/functions/auth(int8).sql
-View                | booking        | tariffs                                  | ./booking/views/tariffs.txt
+Object type         | Schema         | Name                                     | Relative file path                 | File content
+--------------------|----------------|------------------------------------------|------------------------------------|---------------
+Table               | public         | accounts                                 | ./public/tables/accounts.txt       | Description of a table structure
+Stored procedure    | public         | auth(hash bigint)                        | ./public/functions/auth(int8).sql  | Definition of a stored procedure, including the `CREATE OR REPLACE FUNCTION` block
+View                | booking        | tariffs                                  | ./booking/views/tariffs.txt        | Description of a view structure
 
 The file path stores information about the type, scheme and name of the object. This approach makes easier navigation through the dump, as well as code review of changes.
 
