@@ -9,9 +9,9 @@
 Track structure of your PostgreSQL database in VCS using SchemaKeeper.
 
 SchemaKeeper provides 3 functions:
-1. `save` &mdash; saves the structure dump of database objects as separate text files to the specified folder
-1. `verify` &mdash; detects changes between the current database structure and saved dump
-1. `deploy` &mdash; deploys changes in stored procedures to the actual database in accordance with the saved dump 
+1. `save` &mdash; saves the structure of database objects as separate text files to the specified folder
+1. `verify` &mdash; detects changes between the current database structure and saved one
+1. `deploy` &mdash; deploys stored procedures to the current database. See [deploy](#deploy) section for better explanation
 
 You can find more information about SchemaKeeper's workflow in the [wiki](https://github.com/dmytro-demchyna/schema-keeper/wiki/Database-continuous-integration-using-SchemaKeeper).
 
@@ -41,7 +41,7 @@ $params->setSkippedSchemas(['information_schema', 'pg_%']);
 return $params;
 ```
 
-Now you can interact with `schemakeeper` binary.
+Now you can interact with `schemakeeper` binary. It returns exit-code `0` on success and exit-code `1` on failure.
 
 ### save
 
@@ -49,7 +49,7 @@ Now you can interact with `schemakeeper` binary.
 $ schemakeeper -c config.php -d /tmp/schema-keeper save
 ```
 
-The contents of the `/tmp/schema_keeper` (after calling `save`) will be as follows:
+After calling `save` we will get a directory, containing database structure, divided into grouped files that are easy to add to the VCS:
 
 ```
 /tmp/schema_keeper:
@@ -86,7 +86,7 @@ The contents of the `/tmp/schema_keeper` (after calling `save`) will be as follo
         ...
 ```
 
-As a result, we have a directory, containing database structure, divided into grouped files that are easy to add to the VCS.
+File content is a textual representation of the structure of the every database object. For example, the contents of `public/functions/auth(int8).sql` is the complete definition of stored procedure, starting with the `CREATE OR REPLACE FUNCTION` block.
 
 Examples of conversion objects to files:
 
@@ -96,9 +96,7 @@ Table               | public         | accounts                                 
 Stored procedure    | public         | auth(hash bigint)                        | ./public/functions/auth(int8).sql
 View                | booking        | tariffs                                  | ./booking/views/tariffs.txt
 
-As can be seen from the table above, the path to the file stores information about the type, scheme and name of the object. This approach makes easier navigation through the dump, as well as code review of changes.
-
-File content is a textual representation of the structure of the specific database object. For example, the contents of a file for stored procedure will be it's complete definition, starting with the `CREATE OR REPLACE FUNCTION` block.
+The file path stores information about the type, scheme and name of the object. This approach makes easier navigation through the dump, as well as code review of changes.
 
 ### verify
 
@@ -106,9 +104,9 @@ File content is a textual representation of the structure of the specific databa
 $ schemakeeper -c config.php -d /tmp/schema-keeper verify
 ```
 
-Having the saved dump of the current database structure, we are able to check whether changes have been made to the database structure after creating the dump.
+Having the saved database structure, we are able to `verify` saved dump for changes that were made after `save`.
 
-If there are no changes, `verify` will finished with exit-code 0, otherwise &mdash; with exit-code 1 and print information about changed objects.
+The `verify` will display information about changed objects.
 
 An alternative way to check is to call the `save` again, specifying the same directory, and check for changes in the VCS. Since the objects from the database are stored in separate files, the VCS will show only the changed objects. The main disadvantage of this method is the need to overwrite files to see the changes.
 
@@ -118,25 +116,20 @@ An alternative way to check is to call the `save` again, specifying the same dir
 $ schemakeeper -c config.php -d /tmp/schema-keeper deploy
 ```
 
-If deployment successful, command will finished with exit-code 0 and print names of affected functions, otherwise &mdash; with exit-code 1 and print information about error.
-
-> The `deploy` is designed to work with stored procedures written in [PL/pgSQL](https://www.postgresql.org/docs/current/plpgsql.html). Using with other languages may be less effective or impossible.
-
-You can edit source code of stored procedures in the same way as the rest of the application source code using the `deploy`. Modification of the stored procedure occurs by making changes to the corresponding file, which is automatically reflected in the version control system.
+You can edit source code of stored procedures in the same way as the rest of the application source code. Modification of the stored procedure occurs by making changes to the corresponding file in the dump directory, which is automatically reflected in the version control system.
 
 For example, to create a new stored procedure in the `public` schema, just create a new file with the `.sql` extension in the `public/functions` directory, place the source code of the stored procedure in it, including the `CREATE OR REPLACE FUNCTION` block, then call the `deploy`. Similarly occur changes or removal of the stored procedure. Thus, the code simultaneously enters both the VCS and the database.
 
-> When creating a new stored procedure, there is no need to manually enter the correct file name. It is enough that the file has the extension `.sql`. The correct name can be obtained from output of the `deploy`, and used to rename the file.
-
 The `deploy` changes the parameters of the function or the return type without additional actions, while with the classical approach it would be necessary to first perform `DROP FUNCTION`, and only then `CREATE OR REPLACE FUNCTION`.
-
-If an error appears in the source code of the stored procedure, the `deploy` fails, displaying an error. The divergence between the dump and the current database for stored procedures is not possible if you use `deploy` on a permanent basis.
 
 Unfortunately, in some situations `deploy` is not able to automatically apply changes. For example, if you try to delete trigger function, that is used by at least one trigger. Such situations are solved manually with the help of migration files.
 
-If the `deploy` is responsible for transferring changes in stored procedures, then the migration files are used to transfer the remaining changes in the structure. For example, [doctrine/migrations](https://packagist.org/packages/doctrine/migrations) will do.
+The `deploy` is responsible for transferring changes in stored procedures, but the migration files are used to transfer the remaining changes in the structure. For example, [doctrine/migrations](https://packagist.org/packages/doctrine/migrations).
 
-Migrations must be applied before `deploy` starts to make changes to the structure and resolve possible problem situations.
+Migrations must be applied before `deploy` to make changes to the structure and resolve possible problem situations.
+
+> The `deploy` is designed to work with stored procedures written in [PL/pgSQL](https://www.postgresql.org/docs/current/plpgsql.html). Using with other languages may be less effective or impossible.
+
 
 ## Extended usage
 
@@ -169,7 +162,7 @@ $keeper->verifyDump('path_to_dump');
 $keeper->deployDump('path_to_dump');
 ```
 
-You can wrap `verifyDump` into the PHPUnit test:
+You can wrap `verifyDump` into a PHPUnit test:
 
 ```php
 <?php
@@ -194,7 +187,7 @@ class SchemaTest extends \PHPUnit\Framework\TestCase
 
 ```
 
-You can wrap `deployDump` into transaction block:
+You can wrap `deployDump` into a custom transaction block:
 
 ```php
 <?php
