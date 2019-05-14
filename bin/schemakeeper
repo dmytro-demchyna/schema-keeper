@@ -13,25 +13,31 @@ $autoloadVariants = [
 
 $autoloadPath = null;
 
-foreach ($autoloadVariants as $file) {
-    if (file_exists($file)) {
-        $autoloadPath = $file;
+foreach ($autoloadVariants as $variantPath) {
+    if (file_exists($variantPath)) {
+        $autoloadPath = $variantPath;
 
         break;
     }
 }
 
 if (!$autoloadPath) {
-    fwrite(STDERR, "Composer's vendor/autoload.php not found");
+    fwrite(STDERR,
+        'You must set up the project dependencies:' . PHP_EOL .
+        'curl -s http://getcomposer.org/installer | php' . PHP_EOL .
+        'php composer.phar install' . PHP_EOL);
+
     exit(1);
 }
 
 require_once $autoloadPath;
+
+echo \SchemaKeeper\CLI\Version::getVersionText();
 
 $options = getopt('c:d:', ['help', 'version']);
 
 $entryPoint = new \SchemaKeeper\CLI\EntryPoint();
 $result = $entryPoint->run($options, $argv);
 
-fwrite($result->getOutputStream(), $result->getMessage());
+echo $result->getMessage() . PHP_EOL;
 exit($result->getStatus());

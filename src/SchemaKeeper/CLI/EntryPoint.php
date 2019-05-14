@@ -13,8 +13,6 @@ use SchemaKeeper\Keeper;
 
 class EntryPoint
 {
-    const VERSION = 'v2.0.1';
-
     /**
      * @param array $options
      * @param array $argv
@@ -23,32 +21,34 @@ class EntryPoint
      */
     public function run(array $options, array $argv)
     {
+        $message = '';
+
         foreach ($options as $optionName => $optionValue) {
             if (!in_array($optionName, ['c', 'd', 'help', 'version'])) {
-                return new Result('Unrecognized option: '.$optionName, 1, STDERR);
+                $message .= 'Unrecognized option: ' . $optionName;
+
+                return new Result($message, 1);
             }
         }
 
         if (isset($options['help'])) {
-            $helpMessage = "Usage: schemakeeper [options] <command>" . PHP_EOL . PHP_EOL .
+            $message .= "Usage: schemakeeper [options] <command>" . PHP_EOL . PHP_EOL .
                 'Example: schemakeeper -c /path_to_config.php -d /path_to_dump save' . PHP_EOL . PHP_EOL
                 . 'Options:' . PHP_EOL
                 . '  -c    The path to a config file' . PHP_EOL
-                . '  -d    The destination path to a dump directory' . PHP_EOL.PHP_EOL
+                . '  -d    The destination path to a dump directory' . PHP_EOL . PHP_EOL
                 . '  --help       Print this help message' . PHP_EOL
                 . '  --version    Print version information' . PHP_EOL . PHP_EOL
                 . 'Available commands:' . PHP_EOL
                 . '  save' . PHP_EOL
                 . '  verify' . PHP_EOL
-                . '  deploy' . PHP_EOL;
+                . '  deploy';
 
-            return new Result($helpMessage, 0, STDOUT);
+            return new Result($message, 0);
         }
 
         if (isset($options['version'])) {
-            $versionMessage = 'SchemaKeeper ' . self::VERSION . ' by Dmytro Demchyna and contributors' . PHP_EOL;
-
-            return new Result($versionMessage, 0, STDOUT);
+            return new Result($message, 0);
         }
 
         try {
@@ -66,6 +66,7 @@ class EntryPoint
                 $params->getPassword(),
                 [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
             );
+
             $keeper = new Keeper($conn, $params);
             $runner = new Runner($keeper);
 
@@ -73,15 +74,17 @@ class EntryPoint
 
             try {
                 $result = $runner->run($command, $path);
+                $message .= 'Success: ' . $result;
                 $conn->commit();
             } catch (\Exception $exception) {
                 $conn->rollBack();
                 throw $exception;
             }
 
-            return new Result($result, 0, STDOUT);
+            return new Result($message, 0);
         } catch (KeeperException $e) {
-            return new Result($e->getMessage(), 1, STDERR);
+            $message .= 'Failure: ' . $e->getMessage();
+            return new Result($message, 1);
         }
     }
 }

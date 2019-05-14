@@ -39,7 +39,7 @@ class RunnerTest extends SchemaTestCase
 
         $message = $this->target->run('save', '/tmp/dump');
 
-        self::assertEquals('Dump saved to /tmp/dump', $message);
+        self::assertEquals('Dump saved /tmp/dump', $message);
     }
 
     function testVerify()
@@ -58,12 +58,12 @@ class RunnerTest extends SchemaTestCase
 
         $message = $this->target->run('deploy', '/tmp/dump');
 
-        self::assertEquals("Dump deployed /tmp/dump\nDeleted 3\nCreated 1\nCreated 11\nChanged 2", $message);
+        self::assertEquals("Dump deployed /tmp/dump\n  Deleted 3\n  Created 1\n  Created 11\n  Changed 2", $message);
     }
 
     /**
      * @expectedException \SchemaKeeper\Exception\KeeperException
-     * @expectedExceptionMessage Unexpected command blabla. Available commands: save, verify, deploy
+     * @expectedExceptionMessage Unrecognized command blabla. Available commands: save, verify, deploy
      */
     function testUndefinedFunction()
     {

@@ -36,7 +36,7 @@ class Runner
         switch ($command) {
             case 'save':
                 $this->keeper->saveDump($path);
-                $message = 'Dump saved to ' . $path;
+                $message = 'Dump saved ' . $path;
 
                 break;
             case 'verify':
@@ -51,15 +51,15 @@ class Runner
                 $message = '';
 
                 foreach ($result->getDeleted() as $nameDeleted) {
-                    $message .= PHP_EOL . "Deleted $nameDeleted";
+                    $message .= PHP_EOL . "  Deleted $nameDeleted";
                 }
 
                 foreach ($result->getCreated() as $nameCreated) {
-                    $message .= PHP_EOL . "Created $nameCreated";
+                    $message .= PHP_EOL . "  Created $nameCreated";
                 }
 
                 foreach ($result->getChanged() as $nameChanged) {
-                    $message .= PHP_EOL . "Changed $nameChanged";
+                    $message .= PHP_EOL . "  Changed $nameChanged";
                 }
 
                 if ($message) {
@@ -70,7 +70,7 @@ class Runner
 
                 break;
             default:
-                throw new KeeperException('Unexpected command ' . $command . '. Available commands: save, verify, deploy');
+                throw new KeeperException('Unrecognized command ' . $command . '. Available commands: save, verify, deploy');
 
                 break;
         }
