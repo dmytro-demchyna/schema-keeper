@@ -1,4 +1,5 @@
 /composer.phar
+/box.phar
 /vendor
 /composer.lock
 /coverage.xml

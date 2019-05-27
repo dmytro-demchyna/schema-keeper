@@ -6,6 +6,18 @@
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
 
+if (version_compare(PHP_VERSION, '5.6.0', '<')) {
+    fwrite(STDERR, 'SchemaKeeper requires PHP >= 5.6' . PHP_EOL);
+    exit(1);
+}
+
+foreach (['pdo', 'pdo_pgsql', 'json'] as $extension) {
+    if (!extension_loaded($extension)) {
+        fwrite(STDERR, 'SchemaKeeper requires "' . $extension . '" extension' . PHP_EOL);
+        exit(1);
+    }
+}
+
 $autoloadVariants = [
     __DIR__ . '/../../../autoload.php',
     __DIR__ . '/../vendor/autoload.php',
