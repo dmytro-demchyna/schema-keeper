@@ -30,8 +30,6 @@ $ composer require schema-keeper/schema-keeper
 
 ```bash
 $ wget https://github.com/dmytro-demchyna/schema-keeper/releases/latest/download/schemakeeper.phar
-
-$ php schemakeeper.phar --version
 ```
 
 ## Basic Usage
