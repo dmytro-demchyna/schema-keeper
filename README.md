@@ -26,6 +26,14 @@ You can find more information about SchemaKeeper's workflow in the [wiki](https:
 $ composer require schema-keeper/schema-keeper
 ```
 
+### PHAR
+
+```bash
+$ wget https://github.com/dmytro-demchyna/schema-keeper/releases/latest/download/schemakeeper.phar
+
+$ php schemakeeper.phar --version
+```
+
 ## Basic Usage
 
 Create the `config.php` file:
