@@ -28,15 +28,15 @@ class EntryPointTest extends SchemaTestCase
 
     function testOk()
     {
-        $result = $this->target->run(['c' => '/data/.dev/cli-config.php', 'd' => '/tmp/dump'], ['save']);
+        $result = $this->target->run(['c' => '/data/.dev/keeper-config.php', 'd' => '/tmp/dump'], ['save']);
         self::assertEquals('Success: Dump saved /tmp/dump', $result->getMessage());
         self::assertSame(0, $result->getStatus());
 
-        $result = $this->target->run(['c' => '/data/.dev/cli-config.php', 'd' => '/tmp/dump'], ['verify']);
+        $result = $this->target->run(['c' => '/data/.dev/keeper-config.php', 'd' => '/tmp/dump'], ['verify']);
         self::assertEquals('Success: Dump verified /tmp/dump', $result->getMessage());
         self::assertSame(0, $result->getStatus());
 
-        $result = $this->target->run(['c' => '/data/.dev/cli-config.php', 'd' => '/tmp/dump'], ['deploy']);
+        $result = $this->target->run(['c' => '/data/.dev/keeper-config.php', 'd' => '/tmp/dump'], ['deploy']);
         self::assertEquals('Success: Nothing to deploy /tmp/dump', $result->getMessage());
         self::assertSame(0, $result->getStatus());
     }
@@ -65,7 +65,7 @@ class EntryPointTest extends SchemaTestCase
 
     function testUnrecognizedCommand()
     {
-        $result = $this->target->run(['c' => '/data/.dev/cli-config.php', 'd' => '/tmp/dump'], ['blabla']);
+        $result = $this->target->run(['c' => '/data/.dev/keeper-config.php', 'd' => '/tmp/dump'], ['blabla']);
         self::assertEquals(
             'Failure: Unrecognized command blabla. Available commands: save, verify, deploy',
             $result->getMessage()

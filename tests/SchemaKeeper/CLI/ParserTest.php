@@ -27,7 +27,7 @@ class ParserTest extends SchemaTestCase
 
     function testOk()
     {
-        $parsed = $this->target->parse(['c' => '/data/.dev/cli-config.php', 'd' => '/tmp/dump'], ['save']);
+        $parsed = $this->target->parse(['c' => '/data/.dev/keeper-config.php', 'd' => '/tmp/dump'], ['save']);
 
         self::assertInstanceOf(PSQLParameters::class, $parsed->getParams());
         self::assertEquals('/tmp/dump', $parsed->getPath());
@@ -60,6 +60,6 @@ class ParserTest extends SchemaTestCase
      */
     function testWithoutDestinationPath()
     {
-        $this->target->parse(['c' => '/data/.dev/cli-config.php'], []);
+        $this->target->parse(['c' => '/data/.dev/keeper-config.php'], []);
     }
 }

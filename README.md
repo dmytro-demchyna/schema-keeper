@@ -17,9 +17,7 @@ You can find more information about SchemaKeeper's workflow in the [wiki](https:
 
 ## Installation
 
-> OS Windows is currently not supported.
-
-> You must install [psql](https://www.postgresql.org/docs/current/app-psql.html) on the machines where SchemaKeeper will be used.
+> Installation via Composer or PHAR requires installed [psql](https://www.postgresql.org/docs/current/app-psql.html) on machines where SchemaKeeper will be used.
 
 ### Composer
 ```bash
@@ -30,6 +28,12 @@ $ composer require schema-keeper/schema-keeper
 
 ```bash
 $ wget https://github.com/dmytro-demchyna/schema-keeper/releases/latest/download/schemakeeper.phar
+```
+
+### Docker
+
+```bash
+$ docker pull dmytrodemchyna/schema-keeper
 ```
 
 ## Basic Usage

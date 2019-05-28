@@ -47,7 +47,7 @@ abstract class SchemaTestCase extends TestCase
      */
     protected static function getDbParams()
     {
-        $dbParams = include '/data/.dev/cli-config.php';
+        $dbParams = include '/data/.dev/keeper-config.php';
 
         return $dbParams;
     }
