@@ -94,33 +94,24 @@ The command above saves a database structure to a `/project_path/db_name` direct
         - public:
             - functions:
                 - func1(int8).sql
-                - ...
             - materialized_views:
                 - mat_view1.txt
-                - ...
             - sequences:
                 - sequence1.txt
-                - ...
             - tables:
                 - table1.txt
-                - ...
             - triggers:
                 - trigger1.sql
-                - ...
             - types:
                 - type1.txt
-                - ...
             - views:
                 - view1.txt
-                - ...
         - schema2:
             - views:
                 - view2.txt
-                - ...
         - ...
     - extensions:
         - plpgsql.txt
-        - ...
 
 Examples of conversion database structure to files:
 
