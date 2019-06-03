@@ -87,42 +87,40 @@ Now you can use the `schemakeeper` binary. It returns exit-code `0` on success a
 $ schemakeeper -c config.php -d /project_path/db_name save
 ```
 
-This command saves the database structure to a `/project_path/db_name` directory:
+The command above saves a database structure to a `/project_path/db_name` directory. 
 
-```
-/project_path/db_name:
-    structure:
-        public:
-            functions:
-                func1(int8).sql
-                ...
-            materialized_views:
-                mat_view1.txt
-                ...
-            sequences:
-                sequence1.txt
-                ...
-            tables:
-                table1.txt
-                ...
-            triggers:
-                trigger1.sql
-                ...
-            types:
-                type1.txt
-                ...
-            views:
-                view1.txt
-                ...
-        schema2:
-            views:
-                view2.txt
-                ...
-        ...
-    extensions:
-        plpgsql.txt
-        ...
-```
+- /project_path/db_name:
+    - structure:
+        - public:
+            - functions:
+                - func1(int8).sql
+                - ...
+            - materialized_views:
+                - mat_view1.txt
+                - ...
+            - sequences:
+                - sequence1.txt
+                - ...
+            - tables:
+                - table1.txt
+                - ...
+            - triggers:
+                - trigger1.sql
+                - ...
+            - types:
+                - type1.txt
+                - ...
+            - views:
+                - view1.txt
+                - ...
+        - schema2:
+            - views:
+                - view2.txt
+                - ...
+        - ...
+    - extensions:
+        - plpgsql.txt
+        - ...
 
 Examples of conversion database structure to files:
 
@@ -141,7 +139,7 @@ The file path stores information about a type, a scheme and a name of a object. 
 $ schemakeeper -c config.php -d /project_path/db_name verify
 ```
 
-This command compares the actual database structure with the previously saved in `/project_path/db_name` one and displays an information about changed objects.
+The command above compares an actual database structure with the previously saved in `/project_path/db_name` one and displays an information about changed objects.
 
 If changes exists, the `verify` will returns an exit-code `1`.
 
@@ -153,7 +151,7 @@ An alternative way to find changes is to call the `save` again, specifying the s
 $ schemakeeper -c config.php -d /project_path/db_name deploy
 ```
 
-This command deploys stored procedures from the `/project_path/db_name` to the actual database.
+The command above deploys stored procedures from the `/project_path/db_name` to the actual database.
 
 You can edit a source code of stored procedures in the same way as a rest of an application source code. Modification of a stored procedure occurs by making changes to the corresponding file in the `/project_path/db_name` directory, which is automatically reflected in the VCS.
 
