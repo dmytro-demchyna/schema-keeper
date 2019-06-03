@@ -21,7 +21,7 @@ You can find extra information about SchemaKeeper here:
 
 ## Installation
 
-> Installation via Composer or PHAR requires installed [psql](https://www.postgresql.org/docs/current/app-psql.html) on machines where SchemaKeeper will be used.
+> If you choose an installation via Composer or PHAR, please install [psql](https://www.postgresql.org/docs/current/app-psql.html) app on a machines where SchemaKeeper will be used. A Docker build includes pre-installed [psql](https://www.postgresql.org/docs/current/app-psql.html).
 
 ### Composer
 ```bash
@@ -42,20 +42,29 @@ $ docker pull dmytrodemchyna/schema-keeper
 
 ## Basic Usage
 
-Create the `config.php` file:
+Create a `config.php` file:
 
 ```php
 <?php
 
 use SchemaKeeper\Provider\PostgreSQL\PSQLParameters;
 
+// Connection parameters
 $params = new PSQLParameters('localhost', 5432, 'dbname', 'username', 'password');
+
+// These schemas will be ignored
 $params->setSkippedSchemas(['information_schema', 'pg_%']);
+
+// These extensions will be ignored
+$params->setSkippedExtensions(['pgtap']);
+
+// The path to psql executable
+$params->setExecutable('/bin/psql');
 
 return $params;
 ```
 
-Now you can interact with `schemakeeper` binary. It returns exit-code `0` on success and exit-code `1` on failure.
+Now you can use `schemakeeper` binary. It returns exit-code `0` on success and exit-code `1` on failure.
 
 ### save
 
