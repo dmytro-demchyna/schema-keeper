@@ -6,14 +6,18 @@
 [![Build Status](https://img.shields.io/travis/com/dmytro-demchyna/schema-keeper/master.svg)](https://travis-ci.com/dmytro-demchyna/schema-keeper)
 [![Coverage](https://img.shields.io/codecov/c/github/dmytro-demchyna/schema-keeper/master.svg)](https://codecov.io/gh/dmytro-demchyna/schema-keeper)
 
-Track structure of your PostgreSQL database in VCS using SchemaKeeper.
+Track a structure of the your PostgreSQL database in VCS using SchemaKeeper.
 
 SchemaKeeper provides 3 functions:
-1. `save` &mdash; saves the structure of database objects as separate text files to the specified folder
-1. `verify` &mdash; detects changes between the current database structure and saved one
-1. `deploy` &mdash; deploys stored procedures to the current database from the saved structure
+1. `save` &mdash; saves a structure of a database objects as a separate text files to a specified directory
+1. `verify` &mdash; detects changes between an actual database structure and the saved via `save` one
+1. `deploy` &mdash; deploys stored procedures to a database from the saved via `save` structure
 
-You can find more information about SchemaKeeper's workflow in the [wiki](https://github.com/dmytro-demchyna/schema-keeper/wiki/Database-continuous-integration-using-SchemaKeeper).
+You can find extra information about SchemaKeeper here: 
+
+- [https://www.reddit.com/r/PHP/comments/btz1gi/stop_guessing_a_structure_of_your_postgresql](https://www.reddit.com/r/PHP/comments/btz1gi/stop_guessing_a_structure_of_your_postgresql) (en)
+- [https://github.com/dmytro-demchyna/schema-keeper/wiki/Database-continuous-integration-using-SchemaKeeper](https://github.com/dmytro-demchyna/schema-keeper/wiki/Database-continuous-integration-using-SchemaKeeper) (en)
+- [https://habr.com/ru/post/447746/](https://habr.com/ru/post/447746/) (ru)
 
 ## Installation
 
