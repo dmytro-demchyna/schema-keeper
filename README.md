@@ -15,9 +15,9 @@ SchemaKeeper provides 3 functions:
 
 You can find extra information about SchemaKeeper here: 
 
-- [https://www.reddit.com/r/PHP/comments/btz1gi/stop_guessing_a_structure_of_your_postgresql](https://www.reddit.com/r/PHP/comments/btz1gi/stop_guessing_a_structure_of_your_postgresql) (en)
-- [https://github.com/dmytro-demchyna/schema-keeper/wiki/Database-continuous-integration-using-SchemaKeeper](https://github.com/dmytro-demchyna/schema-keeper/wiki/Database-continuous-integration-using-SchemaKeeper) (en)
-- [https://habr.com/ru/post/447746/](https://habr.com/ru/post/447746/) (ru)
+- [reddit](https://www.reddit.com/r/PHP/comments/btz1gi/stop_guessing_a_structure_of_your_postgresql) (en)
+- [github wiki](https://github.com/dmytro-demchyna/schema-keeper/wiki/Database-continuous-integration-using-SchemaKeeper) (en)
+- [habr](https://habr.com/ru/post/447746/) (ru)
 
 ## Installation
 
