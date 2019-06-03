@@ -19,11 +19,26 @@ You can find extra information about SchemaKeeper here:
 - [github wiki](https://github.com/dmytro-demchyna/schema-keeper/wiki/Database-continuous-integration-using-SchemaKeeper) (en)
 - [habr](https://habr.com/ru/post/447746/) (ru)
 
+Table of contents:
+- [Installation](#installation)
+    - [Composer](#composer)
+    - [PHAR](#phar)
+    - [Docker](#docker)
+- [Basic usage](#basic-usage)
+    - [save](#save)
+    - [verify](#verify)
+    - [deploy](#deploy)
+- [Extended usage](#extended-usage)
+    - [PHPUnit](#phpunit)
+    - [Custom transaction block](#custom-transaction-block)
+- [Contributing](#contributing)
+
 ## Installation
 
-> If you choose the installation via Composer or PHAR, please install [psql](https://www.postgresql.org/docs/current/app-psql.html) app on machines where SchemaKeeper will be used. A Docker build includes pre-installed [psql](https://www.postgresql.org/docs/current/app-psql.html).
+> If you choose the installation via Composer or PHAR, please, install [psql](https://www.postgresql.org/docs/current/app-psql.html) app on machines where SchemaKeeper will be used. A Docker build includes pre-installed [psql](https://www.postgresql.org/docs/current/app-psql.html).
 
 ### Composer
+
 ```bash
 $ composer require schema-keeper/schema-keeper
 ```
@@ -185,6 +200,8 @@ $keeper->verifyDump('path_to_dump');
 $keeper->deployDump('path_to_dump');
 ```
 
+### PHPUnit
+
 You can wrap `verifyDump` into a PHPUnit test:
 
 ```php
@@ -209,6 +226,8 @@ class SchemaTest extends \PHPUnit\Framework\TestCase
 }
 
 ```
+
+### Custom transaction block
 
 You can wrap `deployDump` into a custom transaction block:
 
