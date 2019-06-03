@@ -6,10 +6,10 @@
 [![Build Status](https://img.shields.io/travis/com/dmytro-demchyna/schema-keeper/master.svg)](https://travis-ci.com/dmytro-demchyna/schema-keeper)
 [![Coverage](https://img.shields.io/codecov/c/github/dmytro-demchyna/schema-keeper/master.svg)](https://codecov.io/gh/dmytro-demchyna/schema-keeper)
 
-Track a structure of the your PostgreSQL database in VCS using SchemaKeeper.
+Track a structure of the your PostgreSQL database in a VCS using SchemaKeeper.
 
 SchemaKeeper provides 3 functions:
-1. `save` &mdash; saves a structure of a database objects as a separate text files to a specified directory
+1. `save` &mdash; saves a structure of database objects as separate text files to a specified directory
 1. `verify` &mdash; detects changes between an actual database structure and the saved via `save` one
 1. `deploy` &mdash; deploys stored procedures to a database from the saved via `save` structure
 
@@ -21,7 +21,7 @@ You can find extra information about SchemaKeeper here:
 
 ## Installation
 
-> If you choose an installation via Composer or PHAR, please install [psql](https://www.postgresql.org/docs/current/app-psql.html) app on a machines where SchemaKeeper will be used. A Docker build includes pre-installed [psql](https://www.postgresql.org/docs/current/app-psql.html).
+> If you choose an installation via Composer or PHAR, please install [psql](https://www.postgresql.org/docs/current/app-psql.html) app on machines where SchemaKeeper will be used. A Docker build includes pre-installed [psql](https://www.postgresql.org/docs/current/app-psql.html).
 
 ### Composer
 ```bash
@@ -64,22 +64,22 @@ $params->setExecutable('/bin/psql');
 return $params;
 ```
 
-Now you can use `schemakeeper` binary. It returns exit-code `0` on success and exit-code `1` on failure.
+Now you can use the `schemakeeper` binary. It returns exit-code `0` on success and exit-code `1` on failure.
 
 ### save
 
 ```bash
-$ schemakeeper -c config.php -d /tmp/schema-keeper save
+$ schemakeeper -c config.php -d /project_path/db_name save
 ```
 
-After calling `save` we will get a directory, containing database structure, divided into grouped files that are easy to add to the VCS:
+This command saves the database structure to a `/project_path/db_name` directory:
 
 ```
-/tmp/schema_keeper:
+/project_path/db_name:
     structure:
         public:
             functions:
-                auth(int8).sql
+                func1(int8).sql
                 ...
             materialized_views:
                 mat_view1.txt
@@ -88,7 +88,7 @@ After calling `save` we will get a directory, containing database structure, div
                 sequence1.txt
                 ...
             tables:
-                accounts.txt
+                table1.txt
                 ...
             triggers:
                 trigger1.sql
@@ -99,9 +99,9 @@ After calling `save` we will get a directory, containing database structure, div
             views:
                 view1.txt
                 ...
-        booking:
+        schema2:
             views:
-                tariffs.txt
+                view2.txt
                 ...
         ...
     extensions:
@@ -109,52 +109,54 @@ After calling `save` we will get a directory, containing database structure, div
         ...
 ```
 
-Examples of conversion to files:
+Examples of conversion database structure to files:
 
 Object type         | Schema         | Name                                     | Relative file path                 | File content
 --------------------|----------------|------------------------------------------|------------------------------------|---------------
-Table               | public         | accounts                                 | ./public/tables/accounts.txt       | Description of a table structure
-Stored procedure    | public         | auth(hash bigint)                        | ./public/functions/auth(int8).sql  | Definition of a stored procedure, including the `CREATE OR REPLACE FUNCTION` block
-View                | booking        | tariffs                                  | ./booking/views/tariffs.txt        | Description of a view structure
+Table               | public         | table1                                   | ./public/tables/table1.txt         | A description of the table structure
+Stored procedure    | public         | func1(param bigint)                      | ./public/functions/func1(int8).sql | A definition of the stored procedure, including a `CREATE OR REPLACE FUNCTION` block
+View                | schema2        | view2                                    | ./schema2/views/view2.txt          | A description of the view structure
+...                 | ...            | ...                                      | ...                                | ...
 
-The file path stores information about the type, scheme and name of the object. This approach makes easier navigation through the dump, as well as code review of changes.
+The file path stores information about a type, a scheme and a name of a object. This approach makes an easier navigation through the database structure, as well as code review of changes in VCS.
 
 ### verify
 
 ```bash
-$ schemakeeper -c config.php -d /tmp/schema-keeper verify
+$ schemakeeper -c config.php -d /project_path/db_name verify
 ```
 
-Having the saved database structure, we are able to `verify` saved dump for changes that were made after `save`.
+This command compares the actual database structure with the previously saved in `/project_path/db_name` one and displays an information about changed objects.
 
-The `verify` will display information about changed objects.
+If changes exists, the `verify` will returns an exit-code `1`.
 
-An alternative way to check is to call the `save` again, specifying the same directory, and check for changes in the VCS. Since the objects from the database are stored in separate files, the VCS will show only the changed objects. The main disadvantage of this method is the need to overwrite files to see the changes.
+An alternative way to find changes is to call the `save` again, specifying the same directory `/project_path/db_name`, and check changes in the VCS. Since objects from the database are stored in separate files, the VCS will show only changed objects. A main disadvantage of this way &mdash; a need to overwrite files.
 
 ### deploy
 
 ```bash
-$ schemakeeper -c config.php -d /tmp/schema-keeper deploy
+$ schemakeeper -c config.php -d /project_path/db_name deploy
 ```
 
-You can edit source code of stored procedures in the same way as the rest of the application source code. Modification of the stored procedure occurs by making changes to the corresponding file in the dump directory, which is automatically reflected in the version control system.
+This command deploys stored procedures from the `/project_path/db_name` to the actual database.
 
-For example, to create a new stored procedure in the `public` schema, just create a new file with the `.sql` extension in the `public/functions` directory, place the source code of the stored procedure in it, including the `CREATE OR REPLACE FUNCTION` block, then call the `deploy`. Similarly occur changes or removal of the stored procedure. Thus, the code simultaneously enters both the VCS and the database.
+You can edit a source code of stored procedures in the same way as a rest of an application source code. Modification of a stored procedure occurs by making changes to the corresponding file in the `/project_path/db_name` directory, which is automatically reflected in the VCS.
 
-The `deploy` changes the parameters of the function or the return type without additional actions, while with the classical approach it would be necessary to first perform `DROP FUNCTION`, and only then `CREATE OR REPLACE FUNCTION`.
+For example, to create a new stored procedure in the `public` schema, just create a new file with a `.sql` extension in the `/project_path/db_name/structure/public/functions` directory, place a source code of the stored procedure into it, including a `CREATE OR REPLACE FUNCTION` block, then call the `deploy`. Similarly occur modifying or removal of stored procedures. Thus, the code simultaneously enters both the VCS and the database.
 
-Unfortunately, in some situations `deploy` is not able to automatically apply changes. For example, if you try to delete trigger function, that is used by at least one trigger. Such situations are solved manually with the help of migration files.
+The `deploy` changes parameters of a function or a return type without additional actions, while with a classical approach it would be necessary to first perform `DROP FUNCTION`, and only then `CREATE OR REPLACE FUNCTION`.
 
-The `deploy` is responsible for transferring changes in stored procedures, but the migration files are used to transfer the remaining changes in the structure. For example, [doctrine/migrations](https://packagist.org/packages/doctrine/migrations).
+Unfortunately, in some situations `deploy` is not able to automatically apply changes. For example, if you try to delete a trigger function, that is used by at least one trigger. Such situations must be solved manually using migration files.
 
-Migrations must be applied before `deploy` to make changes to the structure and resolve possible problem situations.
+The `deploy` transfers changes only from stored procedures. To transfer other changes, please, use migration files (for example, [doctrine/migrations](https://packagist.org/packages/doctrine/migrations)).
+
+Migrations must be applied before the `deploy` to resolve possible problem situations.
 
 > The `deploy` is designed to work with stored procedures written in [PL/pgSQL](https://www.postgresql.org/docs/current/plpgsql.html). Using with other languages may be less effective or impossible.
 
-
 ## Extended usage
 
-You can inject SchemaKeeper to your own code.
+You can inject SchemaKeeper to a your own code.
 
 ```php
 <?php
