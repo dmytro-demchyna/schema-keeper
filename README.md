@@ -6,12 +6,12 @@
 [![Build Status](https://img.shields.io/travis/com/dmytro-demchyna/schema-keeper/master.svg)](https://travis-ci.com/dmytro-demchyna/schema-keeper)
 [![Coverage](https://img.shields.io/codecov/c/github/dmytro-demchyna/schema-keeper/master.svg)](https://codecov.io/gh/dmytro-demchyna/schema-keeper)
 
-Track a structure of the your PostgreSQL database in a VCS using SchemaKeeper.
+Track a structure of your PostgreSQL database in a VCS using SchemaKeeper.
 
 SchemaKeeper provides 3 functions:
-1. `save` &mdash; saves a structure of database objects as separate text files to a specified directory
-1. `verify` &mdash; detects changes between an actual database structure and the saved via `save` one
-1. `deploy` &mdash; deploys stored procedures to a database from the saved via `save` structure
+1. `save` &mdash; saves a database structure as separate text files to a specified directory
+1. `verify` &mdash; detects changes between an actual database structure and the saved one
+1. `deploy` &mdash; deploys stored procedures to a database from the saved structure
 
 You can find extra information about SchemaKeeper here: 
 
@@ -21,7 +21,7 @@ You can find extra information about SchemaKeeper here:
 
 ## Installation
 
-> If you choose an installation via Composer or PHAR, please install [psql](https://www.postgresql.org/docs/current/app-psql.html) app on machines where SchemaKeeper will be used. A Docker build includes pre-installed [psql](https://www.postgresql.org/docs/current/app-psql.html).
+> If you choose the installation via Composer or PHAR, please install [psql](https://www.postgresql.org/docs/current/app-psql.html) app on machines where SchemaKeeper will be used. A Docker build includes pre-installed [psql](https://www.postgresql.org/docs/current/app-psql.html).
 
 ### Composer
 ```bash
@@ -156,7 +156,7 @@ Migrations must be applied before the `deploy` to resolve possible problem situa
 
 ## Extended usage
 
-You can inject SchemaKeeper to a your own code.
+You can inject SchemaKeeper to your own code.
 
 ```php
 <?php
