@@ -117,9 +117,9 @@ Examples of conversion database structure to files:
 
 Object type         | Schema         | Name                                     | Relative file path                 | File content
 --------------------|----------------|------------------------------------------|------------------------------------|---------------
-Table               | public         | table1                                   | ./public/tables/table1.txt         | A description of the table structure
-Stored procedure    | public         | func1(param bigint)                      | ./public/functions/func1(int8).sql | A definition of the stored procedure, including a `CREATE OR REPLACE FUNCTION` block
-View                | schema2        | view2                                    | ./schema2/views/view2.txt          | A description of the view structure
+Table               | public         | table1                                   | ./public/tables/table1.txt         | A description of the table structure obtained by `\d` [meta](https://www.postgresql.org/docs/current/app-psql.html#APP-PSQL-META-COMMANDS) command
+Stored procedure    | public         | func1(param bigint)                      | ./public/functions/func1(int8).sql | A definition of the stored procedure, including a `CREATE OR REPLACE FUNCTION` block, obtained by [pg_get_functiondef](https://www.postgresql.org/docs/current/functions-info.html#FUNCTIONS-INFO-CATALOG-TABLE)
+View                | schema2        | view2                                    | ./schema2/views/view2.txt          | A description of the view structure obtained by `\d+` [meta](https://www.postgresql.org/docs/current/app-psql.html#APP-PSQL-META-COMMANDS) command
 ...                 | ...            | ...                                      | ...                                | ...
 
 The file path stores information about a type, a scheme and a name of a object. This approach makes an easier navigation through the database structure, as well as code review of changes in VCS.
