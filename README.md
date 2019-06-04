@@ -31,6 +31,7 @@ Table of contents:
 - [Extended usage](#extended-usage)
     - [PHPUnit](#phpunit)
     - [Custom transaction block](#custom-transaction-block)
+    - [Safe deploy to a production](#safe-deploy-to-a-production)
 - [Contributing](#contributing)
 
 ## Installation
@@ -241,6 +242,16 @@ try {
     $conn->rollBack();
 }
 ```
+
+### Safe deploy to a production
+
+A dump of a database structure saved to VCS allows you to check a production database for exact match to the required structure. This ensures that only intended changes were transferred to the production-DB.
+
+Since the PostgreSQL [DDL](https://www.postgresql.org/docs/current/ddl.html) is [transactional](https://wiki.postgresql.org/wiki/Transactional_DDL_in_PostgreSQL:_A_Competitive_Analysis), the following deployment order is recommended:
+1. Start transaction
+1. Apply all migrations in the transaction
+1. In the same transaction, perform `deployDump`
+1. Perform `verifyDump`. If there are no errors, execute `COMMIT`. If there are errors, execute `ROLLBACK`
 
 ## Contributing
 Please refer to [CONTRIBUTING.md](https://github.com/dmytro-demchyna/schema-keeper/blob/master/.github/CONTRIBUTING.md) for information on how to contribute to SchemaKeeper.
