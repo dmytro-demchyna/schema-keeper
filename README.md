@@ -13,13 +13,8 @@ SchemaKeeper provides 3 functions:
 1. `verify` &mdash; detects changes between an actual database structure and the saved one
 1. `deploy` &mdash; deploys stored procedures to a database from the saved structure
 
-You can find extra information about SchemaKeeper here: 
+SchemaKeeper allows to use `gitflow` principles for a database development. Each branch contains its own database structure dump, and when branches are merged, dumps are merged too.
 
-- [reddit](https://www.reddit.com/r/PHP/comments/btz1gi/stop_guessing_a_structure_of_your_postgresql) (en)
-- [github wiki](https://github.com/dmytro-demchyna/schema-keeper/wiki/Database-continuous-integration-using-SchemaKeeper) (en)
-- [habr](https://habr.com/ru/post/447746/) (ru)
-
-Table of contents:
 - [Installation](#installation)
     - [Composer](#composer)
     - [PHAR](#phar)
@@ -31,7 +26,10 @@ Table of contents:
 - [Extended usage](#extended-usage)
     - [PHPUnit](#phpunit)
     - [Custom transaction block](#custom-transaction-block)
+- [Workflow recommendations](#workflow-recommendations)
     - [Safe deploy to a production](#safe-deploy-to-a-production)
+    - [Conflicts resolving](#conflicts-resolving)
+- [Extra links](#extra-links)
 - [Contributing](#contributing)
 
 ## Installation
@@ -243,15 +241,29 @@ try {
 }
 ```
 
+## Workflow recommendations
+
 ### Safe deploy to a production
 
-A dump of a database structure saved to VCS allows you to check a production database for exact match to the required structure. This ensures that only intended changes were transferred to the production-DB.
+A dump of a database structure saved in a VCS allows you to check a production database for exact match to a required structure. This ensures that only intended changes were transferred to the production-DB by deploy.
 
 Since the PostgreSQL [DDL](https://www.postgresql.org/docs/current/ddl.html) is [transactional](https://wiki.postgresql.org/wiki/Transactional_DDL_in_PostgreSQL:_A_Competitive_Analysis), the following deployment order is recommended:
 1. Start transaction
 1. Apply all migrations in the transaction
 1. In the same transaction, perform `deployDump`
 1. Perform `verifyDump`. If there are no errors, execute `COMMIT`. If there are errors, execute `ROLLBACK`
+
+### Conflicts resolving
+A possible conflict situation: *branch1* and *branch2* are branched from *develop*. They haven't conflict with *develop*, but have conflict with each other. A goal is to merge *branch1* and *branch2* into *develop*. 
+
+First, merge *branch1* into *develop*, then merge *develop* into *branch2*, resolve conflicts in *branch2*, and then merge *branch2* into *develop*. At the stage of conflict resolution inside *branch2*, you may have to correct a migration file in *branch2* to match the final dump that contains merge results.
+
+## Extra links
+
+You can find extra information about SchemaKeeper here: 
+
+- [reddit](https://www.reddit.com/r/PHP/comments/btz1gi/stop_guessing_a_structure_of_your_postgresql) (en)
+- [habr](https://habr.com/ru/post/447746/) (ru)
 
 ## Contributing
 Please refer to [CONTRIBUTING.md](https://github.com/dmytro-demchyna/schema-keeper/blob/master/.github/CONTRIBUTING.md) for information on how to contribute to SchemaKeeper.
