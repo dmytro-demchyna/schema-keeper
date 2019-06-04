@@ -266,4 +266,6 @@ You can find extra information about SchemaKeeper here:
 - [habr](https://habr.com/ru/post/447746/) (ru)
 
 ## Contributing
+Any contributions are welcome.
+
 Please refer to [CONTRIBUTING.md](https://github.com/dmytro-demchyna/schema-keeper/blob/master/.github/CONTRIBUTING.md) for information on how to contribute to SchemaKeeper.
