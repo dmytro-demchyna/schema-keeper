@@ -9,7 +9,7 @@ namespace SchemaKeeper\CLI;
 
 class Version
 {
-    const VERSION = 'v2.1.1';
+    const VERSION = 'v2.2.0';
 
     /**
      * @return string
