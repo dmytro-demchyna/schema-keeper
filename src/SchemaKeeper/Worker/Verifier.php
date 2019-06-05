@@ -64,7 +64,7 @@ class Verifier
         $comparisonResult = $this->comparator->compare($expected, $actual);
 
         if ($comparisonResult['expected'] !== $comparisonResult['actual']) {
-            throw new NotEquals('Dump and current database not equals', $comparisonResult['expected'], $comparisonResult['actual']);
+            throw new NotEquals('Dump and current database not equals:', $comparisonResult['expected'], $comparisonResult['actual']);
         }
     }
 }

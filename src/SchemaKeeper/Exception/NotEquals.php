@@ -26,10 +26,10 @@ class NotEquals extends KeeperException
      */
     public function __construct($message, array $expected, array $actual)
     {
-        $message .= ' '.json_encode([
+        $message .= PHP_EOL . json_encode([
             'expected' => $expected,
             'actual' => $actual,
-        ]);
+        ], JSON_PRETTY_PRINT);
 
         parent::__construct($message);
 

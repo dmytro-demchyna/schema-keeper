@@ -57,7 +57,15 @@ class VerifierTest extends SchemaTestCase
             $this->target->verify('/tmp/schema_keeper');
         } catch (NotEquals $e) {
             $catch = true;
-            $expectedMessage = 'Dump and current database not equals {"expected":[],"actual":{"triggers":{"public.test_table.test_trigger":"CREATE TRIGGER test_trigger BEFORE UPDATE ON test_table FOR EACH ROW EXECUTE PROCEDURE trig_test()"}}}';
+            $expectedMessage = 'Dump and current database not equals:
+{
+    "expected": [],
+    "actual": {
+        "triggers": {
+            "public.test_table.test_trigger": "CREATE TRIGGER test_trigger BEFORE UPDATE ON test_table FOR EACH ROW EXECUTE PROCEDURE trig_test()"
+        }
+    }
+}';
             $expectedTriggers = [
                 'triggers' => [
                     'public.test_table.test_trigger' => 'CREATE TRIGGER test_trigger BEFORE UPDATE ON test_table FOR EACH ROW EXECUTE PROCEDURE trig_test()',

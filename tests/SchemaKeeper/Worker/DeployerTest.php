@@ -124,7 +124,7 @@ $function$
 
     /**
      * @expectedException \SchemaKeeper\Exception\KeeperException
-     * @expectedExceptionMessage Some functions have diff between their definitions before deploy and their definitions after deploy: public.trig_test(); public.trig_test().
+     * @expectedExceptionMessage Some functions have diff between their definitions before deploy and their definitions after deploy:
      */
     public function testChangeFunctionWithDiff()
     {
