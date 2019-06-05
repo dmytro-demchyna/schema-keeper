@@ -113,7 +113,11 @@ class Deployer
         $comparisonResult = $this->comparator->compareSection('functions', $expectedFunctions, $actualFunctions);
 
         if ($comparisonResult['actual'] !== $comparisonResult['expected']) {
-            $message = 'Some functions have diff between their definitions before deploy and their definitions after deploy';
+            $leftString = implode(', ', array_keys($comparisonResult['expected']['functions']));
+            $rightString = implode(', ', array_keys($comparisonResult['actual']['functions']));
+            $allString = $leftString . '; ' . $rightString . '.';
+
+            $message = 'Some functions have diff between their definitions before deploy and their definitions after deploy: ' . $allString;
 
             throw new NotEquals($message, $comparisonResult['expected'], $comparisonResult['actual']);
         }
