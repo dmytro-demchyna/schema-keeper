@@ -5,7 +5,7 @@
 [![Minimum PostgreSQL Version](https://img.shields.io/badge/postgreSQL-%3E%3D9.4-blue.svg)](https://www.postgresql.org/)
 [![Build Status](https://img.shields.io/travis/com/dmytro-demchyna/schema-keeper/master.svg)](https://travis-ci.com/dmytro-demchyna/schema-keeper)
 [![Coverage](https://img.shields.io/codecov/c/github/dmytro-demchyna/schema-keeper/master.svg)](https://codecov.io/gh/dmytro-demchyna/schema-keeper)
-![License](https://img.shields.io/github/license/dmytro-demchyna/schema-keeper.svg)
+[![License](https://img.shields.io/github/license/dmytro-demchyna/schema-keeper.svg)](https://github.com/dmytro-demchyna/schema-keeper/blob/master/LICENSE)
 
 Track a structure of your PostgreSQL database in a VCS using SchemaKeeper.
 

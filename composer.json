@@ -1,6 +1,6 @@
 {
   "name": "schema-keeper/schema-keeper",
-  "description": "Continuous integration tools for PostgreSQL projects",
+  "description": "Mapping PostgreSQL database structure to a file system",
   "minimum-stability": "stable",
   "type": "library",
   "license": "MIT",
@@ -21,7 +21,8 @@
     {
       "name": "Dmytro Demchyna",
       "email": "dmitry.demchina@gmail.com",
-      "role": "Developer"
+      "role": "Developer",
+      "homepage": "https://github.com/dmytro-demchyna"
     }
   ],
   "autoload": {
