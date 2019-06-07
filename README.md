@@ -5,6 +5,7 @@
 [![Minimum PostgreSQL Version](https://img.shields.io/badge/postgreSQL-%3E%3D9.4-blue.svg)](https://www.postgresql.org/)
 [![Build Status](https://img.shields.io/travis/com/dmytro-demchyna/schema-keeper/master.svg)](https://travis-ci.com/dmytro-demchyna/schema-keeper)
 [![Coverage](https://img.shields.io/codecov/c/github/dmytro-demchyna/schema-keeper/master.svg)](https://codecov.io/gh/dmytro-demchyna/schema-keeper)
+![License](https://img.shields.io/github/license/dmytro-demchyna/schema-keeper.svg)
 
 Track a structure of your PostgreSQL database in a VCS using SchemaKeeper.
 
@@ -15,6 +16,7 @@ SchemaKeeper provides 3 functions:
 
 SchemaKeeper allows to use `gitflow` principles for a database development. Each branch contains its own database structure dump, and when branches are merged, dumps are merged too.
 
+## Table of contents
 - [Installation](#installation)
     - [Composer](#composer)
     - [PHAR](#phar)
@@ -264,6 +266,8 @@ You can find extra information about SchemaKeeper here:
 
 - [reddit](https://www.reddit.com/r/PHP/comments/btz1gi/stop_guessing_a_structure_of_your_postgresql) (en)
 - [habr](https://habr.com/ru/post/447746/) (ru)
+
+If you are not satisfied with SchemaKeeper, look at the list of another tools: https://wiki.postgresql.org/wiki/Change_management_tools_and_techniques
 
 ## Contributing
 Any contributions are welcome.
