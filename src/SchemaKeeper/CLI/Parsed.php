@@ -26,38 +26,24 @@ class Parsed
      */
     private $path;
 
-    /**
-     * @param PSQLParameters $params
-     * @param string $command
-     * @param string $path
-     */
-    public function __construct(PSQLParameters $params, $command, $path)
+    public function __construct(PSQLParameters $params, string $command, string $path)
     {
         $this->params = $params;
         $this->command = $command;
         $this->path = $path;
     }
 
-    /**
-     * @return PSQLParameters
-     */
-    public function getParams()
+    public function getParams(): PSQLParameters
     {
         return $this->params;
     }
 
-    /**
-     * @return string
-     */
-    public function getCommand()
+    public function getCommand(): string
     {
         return $this->command;
     }
 
-    /**
-     * @return string
-     */
-    public function getPath()
+    public function getPath(): string
     {
         return $this->path;
     }

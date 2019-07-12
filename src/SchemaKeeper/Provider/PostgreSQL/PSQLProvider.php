@@ -9,6 +9,7 @@ namespace SchemaKeeper\Provider\PostgreSQL;
 
 use Exception;
 use PDO;
+use SchemaKeeper\Exception\KeeperException;
 use SchemaKeeper\Provider\IProvider;
 
 class PSQLProvider implements IProvider
@@ -24,12 +25,12 @@ class PSQLProvider implements IProvider
     protected $psqlClient;
 
     /**
-     * @var array
+     * @var string[]
      */
     protected $skippedSchemaNames;
 
     /**
-     * @var array
+     * @var string[]
      */
     protected $skippedExtensionNames;
 
@@ -39,12 +40,6 @@ class PSQLProvider implements IProvider
     protected $savePointHelper;
 
 
-    /**
-     * @param PDO $conn
-     * @param PSQLClient $psqlClient
-     * @param array $skippedSchemaNames
-     * @param array $skippedExtensionNames
-     */
     public function __construct(
         PDO $conn,
         PSQLClient $psqlClient,
@@ -59,10 +54,7 @@ class PSQLProvider implements IProvider
         $this->savePointHelper = new SavepointHelper($conn);
     }
 
-    /**
-     * @return array
-     */
-    public function getTables()
+    public function getTables(): array
     {
         $sql = '
         SELECT concat_ws(\'.\', schemaname, tablename) AS table_path
@@ -72,7 +64,7 @@ class PSQLProvider implements IProvider
           ORDER BY table_path
          ';
 
-        $stmt = $this->conn->query($sql);
+        $stmt = $this->query($sql);
 
         $commands = [];
         while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
@@ -86,12 +78,9 @@ class PSQLProvider implements IProvider
         return $actualTables;
     }
 
-    /**
-     * @return array
-     */
-    public function getViews()
+    public function getViews(): array
     {
-        $stmt = $this->conn->query('
+        $stmt = $this->query('
             SELECT (schemaname || \'.\' || viewname) AS view_path
             FROM pg_catalog.pg_views
             WHERE '.$this->expandLike('schemaname', $this->skippedSchemaNames).'
@@ -109,12 +98,9 @@ class PSQLProvider implements IProvider
         return $actualViews;
     }
 
-    /**
-     * @return array
-     */
-    public function getMaterializedViews()
+    public function getMaterializedViews(): array
     {
-        $stmt = $this->conn->query('
+        $stmt = $this->query('
             SELECT (schemaname || \'.\' || matviewname) AS view_path
             FROM pg_catalog.pg_matviews
             WHERE '.$this->expandLike('schemaname', $this->skippedSchemaNames).'
@@ -132,10 +118,7 @@ class PSQLProvider implements IProvider
         return $actualViews;
     }
 
-    /**
-     * @return array
-     */
-    public function getTriggers()
+    public function getTriggers(): array
     {
         $actualTriggers = [];
 
@@ -153,7 +136,7 @@ class PSQLProvider implements IProvider
             ORDER BY tg_path
         ";
 
-        $stmt = $this->conn->query($sql);
+        $stmt = $this->query($sql);
 
         while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
             $trigger = $this->prepareName($row['tg_path']);
@@ -165,10 +148,7 @@ class PSQLProvider implements IProvider
         return $actualTriggers;
     }
 
-    /**
-     * @return array
-     */
-    public function getFunctions()
+    public function getFunctions(): array
     {
         $actualFunctions = [];
 
@@ -197,7 +177,7 @@ class PSQLProvider implements IProvider
             ORDER BY pro_path
         ';
 
-        $stmt = $this->conn->query($sql);
+        $stmt = $this->query($sql);
 
         while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
             $argTypes = $row['arg_types'];
@@ -209,10 +189,7 @@ class PSQLProvider implements IProvider
         return $actualFunctions;
     }
 
-    /**
-     * @return array
-     */
-    public function getTypes()
+    public function getTypes(): array
     {
         $actualTypes = [];
 
@@ -232,7 +209,7 @@ class PSQLProvider implements IProvider
               ORDER BY type_path
         ";
 
-        $stmt = $this->conn->query($sql);
+        $stmt = $this->query($sql);
 
         while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
             $type = $row['type_path'];
@@ -244,16 +221,13 @@ class PSQLProvider implements IProvider
             }
 
             $type = $this->prepareName($type);
-            $actualTypes[$type] = $definition;
+            $actualTypes[$type] = (string) $definition;
         }
 
         return $actualTypes;
     }
 
-    /**
-     * @return array
-     */
-    public function getSchemas()
+    public function getSchemas(): array
     {
         $actualSchemas = [];
 
@@ -264,7 +238,7 @@ class PSQLProvider implements IProvider
             ORDER BY schema_name
         ';
 
-        $stmt = $this->conn->query($sql);
+        $stmt = $this->query($sql);
 
         while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
             $schema = $this->prepareName($row['schema_name']);
@@ -274,10 +248,7 @@ class PSQLProvider implements IProvider
         return $actualSchemas;
     }
 
-    /**
-     * @return array
-     */
-    public function getExtensions()
+    public function getExtensions(): array
     {
         $actualExtensions = [];
 
@@ -292,7 +263,7 @@ class PSQLProvider implements IProvider
             ORDER BY extname;
         ';
 
-        $stmt = $this->conn->query($sql);
+        $stmt = $this->query($sql);
 
         while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
             $extension = $this->prepareName($row['extname']);
@@ -303,10 +274,7 @@ class PSQLProvider implements IProvider
         return $actualExtensions;
     }
 
-    /**
-     * @return array
-     */
-    public function getSequences()
+    public function getSequences(): array
     {
         $sql = "
             SELECT
@@ -321,29 +289,33 @@ class PSQLProvider implements IProvider
             ORDER BY  seq_path
         ";
 
-        $stmt = $this->conn->query($sql);
+        $stmt = $this->query($sql);
 
         $actualSequences = [];
         while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
             $sequence = $this->prepareName($row['seq_path']);
-            $actualSequences[$sequence] = json_encode($row, JSON_PRETTY_PRINT);
+            $actualSequences[$sequence] = (string) json_encode($row, JSON_PRETTY_PRINT);
+
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new \RuntimeException('Json error: ' . json_last_error_msg());
+            }
         }
 
         return $actualSequences;
     }
 
-    public function createFunction($definition)
+    public function createFunction(string $definition): void
     {
         $this->conn->exec($definition);
     }
 
-    public function deleteFunction($name)
+    public function deleteFunction(string $name): void
     {
         $sqlDelete = 'DROP FUNCTION ' . $name;
         $this->conn->exec($sqlDelete);
     }
 
-    public function changeFunction($name, $definition)
+    public function changeFunction(string $name, string $definition): void
     {
         $isTransaction = $this->conn->inTransaction();
 
@@ -358,21 +330,12 @@ class PSQLProvider implements IProvider
         }
     }
 
-    /**
-     * @param string $name
-     * @return string
-     */
-    private function prepareName($name)
+    private function prepareName(string $name): string
     {
         return str_replace(['{', '}'], ['(', ')'], $name);
     }
 
-    /**
-     * @param string $columnName
-     * @param array $patterns
-     * @return string
-     */
-    private function expandLike($columnName, array $patterns)
+    private function expandLike(string $columnName, array $patterns): string
     {
         $sql = '';
 
@@ -387,5 +350,16 @@ class PSQLProvider implements IProvider
         $sql = trim($sql, " AND");
 
         return $sql;
+    }
+
+    private function query(string $sql): \PDOStatement
+    {
+        $stmt = $this->conn->query($sql);
+
+        if ($stmt === false) {
+            throw new KeeperException(print_r($this->conn->errorInfo(), true));
+        }
+
+        return $stmt;
     }
 }

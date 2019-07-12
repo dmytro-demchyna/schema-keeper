@@ -13,13 +13,7 @@ use SchemaKeeper\Keeper;
 
 class EntryPoint
 {
-    /**
-     * @param array $options
-     * @param array $argv
-     * @return Result
-     * @throws \Exception
-     */
-    public function run(array $options, array $argv)
+    public function run(array $options, array $argv): Result
     {
         $message = '';
 

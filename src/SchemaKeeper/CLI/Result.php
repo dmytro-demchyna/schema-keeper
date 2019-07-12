@@ -19,28 +19,18 @@ class Result
      */
     private $status;
 
-    /**
-     * @param string $message
-     * @param int $status
-     */
-    public function __construct($message, $status)
+    public function __construct(string $message, int $status)
     {
         $this->message = $message;
         $this->status = $status;
     }
 
-    /**
-     * @return string
-     */
-    public function getMessage()
+    public function getMessage(): string
     {
         return $this->message;
     }
 
-    /**
-     * @return int
-     */
-    public function getStatus()
+    public function getStatus(): int
     {
         return $this->status;
     }

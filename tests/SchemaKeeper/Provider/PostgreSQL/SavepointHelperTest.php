@@ -36,7 +36,7 @@ class SavepointHelperTest extends SchemaTestCase
     public function testBeginTransaction()
     {
         $this->conn->shouldNotReceive('exec');
-        $this->conn->shouldReceive('beginTransaction')->once();
+        $this->conn->shouldReceive('beginTransaction')->andReturnFalse()->once();
 
         $this->target->beginTransaction('test', false);
     }
@@ -52,7 +52,7 @@ class SavepointHelperTest extends SchemaTestCase
     public function testCommit()
     {
         $this->conn->shouldNotReceive('exec');
-        $this->conn->shouldReceive('commit')->once();
+        $this->conn->shouldReceive('commit')->andReturnFalse()->once();
 
         $this->target->commit('test', false);
     }
@@ -68,7 +68,7 @@ class SavepointHelperTest extends SchemaTestCase
     public function testRollback()
     {
         $this->conn->shouldNotReceive('exec');
-        $this->conn->shouldReceive('rollback')->once();
+        $this->conn->shouldReceive('rollback')->andReturnFalse()->once();
 
         $this->target->rollback('test', false);
     }

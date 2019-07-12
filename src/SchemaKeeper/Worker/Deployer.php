@@ -40,9 +40,7 @@ class Deployer
      */
     private $converter;
 
-    /**
-     * @param IProvider $provider
-     */
+
     public function __construct(IProvider $provider)
     {
         $helper = new FilesystemHelper();
@@ -53,12 +51,7 @@ class Deployer
         $this->provider = $provider;
     }
 
-    /**
-     * @param string $sourcePath
-     * @return DeployedFunctions
-     * @throws Exception
-     */
-    public function deploy($sourcePath)
+    public function deploy(string $sourcePath): DeployedFunctions
     {
         $functions = $this->provider->getFunctions();
         $actualFunctionNames = array_keys($functions);

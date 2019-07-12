@@ -27,9 +27,6 @@ class Saver
      */
     private $writer;
 
-    /**
-     * @param IProvider $provider
-     */
     public function __construct(IProvider $provider)
     {
         $schemaFilter = new SchemaFilter();
@@ -39,11 +36,7 @@ class Saver
         $this->writer = new DumpWriter($sectionWriter, $helper);
     }
 
-    /**
-     * @param string $destinationPath
-     * @throws Exception
-     */
-    public function save($destinationPath)
+    public function save(string $destinationPath): void
     {
         $dump = $this->dumper->dump();
         $this->writer->write($destinationPath, $dump);

@@ -41,15 +41,7 @@ class PSQLClient
      */
     protected $password;
 
-    /**
-     * @param string $executable
-     * @param string $dbName
-     * @param string $host
-     * @param string $port
-     * @param string $user
-     * @param string $password
-     */
-    public function __construct($executable, $dbName, $host, $port, $user, $password)
+    public function __construct(string $executable, string $dbName, string $host, int $port, string $user, string $password)
     {
         $this->executable = $executable;
         $this->dbName = $dbName;
@@ -59,12 +51,7 @@ class PSQLClient
         $this->password = $password;
     }
 
-    /**
-     * @param string $command
-     * @return string|null
-     * @throws KeeperException
-     */
-    public function run($command)
+    public function run(string $command): ?string
     {
         $this->putPassword();
 
@@ -74,11 +61,11 @@ class PSQLClient
     }
 
     /**
-     * @param array $commands
-     * @return array
+     * @param array<string, string> $commands
+     * @return array<string, string>
      * @throws KeeperException
      */
-    public function runMultiple(array $commands)
+    public function runMultiple(array $commands): array
     {
         $this->putPassword();
 
@@ -108,7 +95,7 @@ class PSQLClient
 
         $req = $this->generateScript() . $commandsString;
 
-        $rawOutput = shell_exec($req);
+        $rawOutput = (string) shell_exec($req);
 
         $outputs = explode($separator, $rawOutput);
 
@@ -121,12 +108,12 @@ class PSQLClient
         return $results;
     }
 
-    private function generateScript()
+    private function generateScript(): string
     {
         return $this->executable . ' -U' . $this->user . ' -h' . $this->host . ' -p' . $this->port . ' -d' . $this->dbName;
     }
 
-    private function putPassword()
+    private function putPassword(): void
     {
         putenv("PGPASSWORD=" . $this->password);
     }

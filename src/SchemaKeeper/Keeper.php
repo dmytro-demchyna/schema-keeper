@@ -56,7 +56,7 @@ class Keeper
      * @param string $destinationPath Dump will be saved in this folder
      * @throws Exception
      */
-    public function saveDump($destinationPath)
+    public function saveDump(string $destinationPath): void
     {
         $this->saver->save($destinationPath);
     }
@@ -66,7 +66,7 @@ class Keeper
      * @param string $dumpPath Path to previously saved dump
      * @throws Exception
      */
-    public function verifyDump($dumpPath)
+    public function verifyDump(string $dumpPath): void
     {
         $this->verifier->verify($dumpPath);
     }
@@ -77,7 +77,7 @@ class Keeper
      * @return DeployedFunctions
      * @throws Exception
      */
-    public function deployDump($dumpPath)
+    public function deployDump(string $dumpPath): DeployedFunctions
     {
         return $this->deployer->deploy($dumpPath);
     }

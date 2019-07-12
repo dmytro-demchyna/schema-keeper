@@ -44,6 +44,8 @@ class VerifierTest extends SchemaTestCase
     {
         $this->saver->save('/tmp/schema_keeper');
         $this->target->verify('/tmp/schema_keeper');
+
+        self::assertTrue(true);
     }
 
     public function testDiff()

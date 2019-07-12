@@ -16,15 +16,13 @@ class PSQLChecker
      */
     private $parameters;
 
-    /**
-     * @param PSQLParameters $parameters
-     */
+
     public function __construct(PSQLParameters $parameters)
     {
         $this->parameters = $parameters;
     }
 
-    public function check()
+    public function check(): void
     {
         if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
             throw new KeeperException('OS Windows is currently not supported');

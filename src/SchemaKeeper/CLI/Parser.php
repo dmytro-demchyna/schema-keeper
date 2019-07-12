@@ -12,13 +12,7 @@ use SchemaKeeper\Provider\PostgreSQL\PSQLParameters;
 
 class Parser
 {
-    /**
-     * @param $options
-     * @param $argv
-     * @return Parsed
-     * @throws \Exception
-     */
-    public function parse($options, $argv)
+    public function parse(array $options, array $argv): Parsed
     {
         $configPath = isset($options['c']) ? $options['c'] : null;
 

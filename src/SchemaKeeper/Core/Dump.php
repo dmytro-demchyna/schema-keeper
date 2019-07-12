@@ -32,7 +32,7 @@ class Dump
     /**
      * @return SchemaStructure[]
      */
-    public function getSchemas()
+    public function getSchemas(): array
     {
         return $this->schemas;
     }
@@ -40,7 +40,7 @@ class Dump
     /**
      * @return string[]
      */
-    public function getExtensions()
+    public function getExtensions(): array
     {
         return $this->extensions;
     }

@@ -17,21 +17,12 @@ class Runner
      */
     private $keeper;
 
-    /**
-     * @param Keeper $keeper
-     */
     public function __construct(Keeper $keeper)
     {
         $this->keeper = $keeper;
     }
 
-    /**
-     * @param string $command
-     * @param string $path
-     * @return string
-     * @throws \Exception
-     */
-    public function run($command, $path)
+    public function run(string $command, string $path): string
     {
         switch ($command) {
             case 'save':

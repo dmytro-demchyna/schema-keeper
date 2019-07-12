@@ -11,10 +11,7 @@ class Version
 {
     const VERSION = 'v2.2.0';
 
-    /**
-     * @return string
-     */
-    public static function getVersionText()
+    public static function getVersionText(): string
     {
         return 'SchemaKeeper ' . self::VERSION . ' by Dmytro Demchyna and contributors.' . PHP_EOL. PHP_EOL;
     }

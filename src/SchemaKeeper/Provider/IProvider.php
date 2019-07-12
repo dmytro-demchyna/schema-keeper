@@ -10,63 +10,63 @@ namespace SchemaKeeper\Provider;
 interface IProvider
 {
     /**
-     * @return array
+     * @return array<string, string>
      */
-    public function getTables();
+    public function getTables(): array;
 
     /**
-     * @return array
+     * @return array<string, string>
      */
-    public function getViews();
+    public function getViews(): array;
 
     /**
-     * @return array
+     * @return array<string, string>
      */
-    public function getMaterializedViews();
+    public function getMaterializedViews(): array;
 
     /**
-     * @return array
+     * @return array<string, string>
      */
-    public function getTriggers();
+    public function getTriggers(): array;
 
     /**
-     * @return array
+     * @return array<string, string>
      */
-    public function getFunctions();
+    public function getFunctions(): array;
 
     /**
-     * @return array
+     * @return array<string, string>
      */
-    public function getTypes();
+    public function getTypes(): array;
 
     /**
-     * @return array
+     * @return array<string, string>
      */
-    public function getSchemas();
+    public function getSchemas(): array;
 
     /**
-     * @return array
+     * @return array<string, string>
      */
-    public function getExtensions();
+    public function getExtensions(): array;
 
     /**
-     * @return array
+     * @return array<string, string>
      */
-    public function getSequences();
+    public function getSequences(): array;
 
     /**
      * @param string $definition
      */
-    public function createFunction($definition);
+    public function createFunction(string $definition): void;
 
     /**
      * @param string $name
      */
-    public function deleteFunction($name);
+    public function deleteFunction(string $name): void;
 
     /**
      * @param string $name
      * @param string $definition
      */
-    public function changeFunction($name, $definition);
+    public function changeFunction(string $name, string $definition): void;
 }

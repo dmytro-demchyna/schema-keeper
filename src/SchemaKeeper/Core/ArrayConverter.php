@@ -7,13 +7,15 @@
 
 namespace SchemaKeeper\Core;
 
+use SchemaKeeper\Exception\KeeperException;
+
 class ArrayConverter
 {
     /**
      * @param Dump $dump
-     * @return array
+     * @return array<string, array>
      */
-    public function dump2Array(Dump $dump)
+    public function dump2Array(Dump $dump): array
     {
         $keysMapping = [
             'tables' => 'getTables',
@@ -26,6 +28,11 @@ class ArrayConverter
         ];
 
         $result = array_combine(array_keys($keysMapping), array_fill(0, count($keysMapping), []));
+
+        if ($result === false) {
+            throw new KeeperException('array_combine() problem');
+        }
+
         $result['schemas'] = [];
         $result['extensions'] = $dump->getExtensions();
 

@@ -22,7 +22,7 @@ class ProviderFactory
      * @return IProvider
      * @throws KeeperException
      */
-    public function createProvider(PDO $conn, $parameters = null)
+    public function createProvider(PDO $conn, $parameters = null): IProvider
     {
         if ($conn->getAttribute(PDO::ATTR_DRIVER_NAME) !== 'pgsql') {
             throw new KeeperException('Only pgsql driver is supported');

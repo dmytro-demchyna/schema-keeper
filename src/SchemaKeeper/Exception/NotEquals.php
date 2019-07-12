@@ -31,6 +31,10 @@ class NotEquals extends KeeperException
             'actual' => $actual,
         ], JSON_PRETTY_PRINT);
 
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new \RuntimeException('Json error: ' . json_last_error_msg());
+        }
+
         parent::__construct($message);
 
         $this->expected = $expected;

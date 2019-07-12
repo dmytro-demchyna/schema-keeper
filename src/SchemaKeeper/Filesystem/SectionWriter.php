@@ -21,10 +21,10 @@ class SectionWriter
 
     /**
      * @param string $sectionPath
-     * @param array $sectionContent
+     * @param array<string, string> $sectionContent
      * @throws \Exception
      */
-    public function writeSection($sectionPath, array $sectionContent)
+    public function writeSection(string $sectionPath, array $sectionContent): void
     {
         if (!$sectionContent) {
             return;

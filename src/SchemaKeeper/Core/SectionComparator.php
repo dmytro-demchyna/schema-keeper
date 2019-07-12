@@ -13,19 +13,21 @@ class SectionComparator
      * @param string $sectionName
      * @param array $expectedSection
      * @param array $actualSection
-     * @return array
+     * @return array{expected:array,actual:array}
      */
-    public function compareSection($sectionName, array $expectedSection, array $actualSection)
+    public function compareSection(string $sectionName, array $expectedSection, array $actualSection): array
     {
         if ($expectedSection === $actualSection) {
-            return [];
+            return ['expected' => [], 'actual' => []];
         }
 
-        $result = $this->doCompare($sectionName, $expectedSection, $actualSection);
-        $resultInverted = $this->doCompare($sectionName, $actualSection, $expectedSection);
+        $compared = $this->doCompare($sectionName, $expectedSection, $actualSection);
+        $comparedInverted = $this->doCompare($sectionName, $actualSection, $expectedSection);
 
-        $result['expected'] = array_merge($result['expected'], $resultInverted['actual']);
-        $result['actual'] = array_merge($result['actual'], $resultInverted['expected']);
+        $result = [
+            'expected' => array_merge($compared['expected'], $comparedInverted['actual']),
+            'actual' => array_merge($compared['actual'], $comparedInverted['expected']),
+        ];
 
         return $result;
     }
@@ -36,7 +38,7 @@ class SectionComparator
      * @param array $actualSection
      * @return array
      */
-    private function doCompare($sectionName, array $expectedSection, array $actualSection)
+    private function doCompare(string $sectionName, array $expectedSection, array $actualSection): array
     {
         $result = [
             'expected' => [],

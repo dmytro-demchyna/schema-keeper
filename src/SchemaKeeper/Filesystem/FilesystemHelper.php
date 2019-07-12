@@ -12,21 +12,12 @@ use SchemaKeeper\Exception\KeeperException;
 
 class FilesystemHelper
 {
-    /**
-     * @param string $path
-     * @return bool
-     */
-    public function isDir($path)
+    public function isDir(string $path): bool
     {
         return is_dir($path);
     }
 
-    /**
-     * @param string $filename
-     * @return string
-     * @throws Exception
-     */
-    public function fileGetContents($filename)
+    public function fileGetContents(string $filename): string
     {
         $content = file_get_contents($filename);
 
@@ -37,12 +28,7 @@ class FilesystemHelper
         return $content;
     }
 
-    /**
-     * @param string $filename
-     * @param string $data
-     * @throws Exception
-     */
-    public function filePutContents($filename, $data)
+    public function filePutContents(string $filename, string $data): void
     {
         $result = file_put_contents($filename, $data);
 
@@ -51,22 +37,18 @@ class FilesystemHelper
         }
     }
 
-    /**
-     * @param string $pattern
-     * @return array|false
-     */
-    public function glob($pattern)
+    public function glob(string $pattern): array
     {
-        return glob($pattern);
+        $result = glob($pattern);
+
+        if ($result === false) {
+            throw new KeeperException('glob() error');
+        }
+
+        return $result;
     }
 
-    /**
-     * @param string $pathname
-     * @param int $mode
-     * @param bool $recursive
-     * @throws Exception
-     */
-    public function mkdir($pathname, $mode = 0775, $recursive = false)
+    public function mkdir(string $pathname, int $mode = 0775, bool $recursive = false): void
     {
         $result = mkdir($pathname, $mode, $recursive);
 
@@ -75,10 +57,7 @@ class FilesystemHelper
         }
     }
 
-    /**
-     * @param string $path
-     */
-    public function rmDirIfExisted($path)
+    public function rmDirIfExisted(string $path): void
     {
         if ($this->isDir($path)) {
             shell_exec("rm -rf ".escapeshellarg($path));

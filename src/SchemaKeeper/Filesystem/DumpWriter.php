@@ -22,22 +22,14 @@ class DumpWriter
      */
     private $helper;
 
-    /**
-     * @param SectionWriter $sectionWriter
-     * @param FilesystemHelper $helper
-     */
+
     public function __construct(SectionWriter $sectionWriter, FilesystemHelper $helper)
     {
         $this->sectionWriter = $sectionWriter;
         $this->helper = $helper;
     }
 
-    /**
-     * @param string $path
-     * @param Dump $dump
-     * @throws Exception
-     */
-    public function write($path, Dump $dump)
+    public function write(string $path, Dump $dump): void
     {
         $structurePath = $path.'/structure';
         $extensionsPath = $path.'/extensions';

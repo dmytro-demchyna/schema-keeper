@@ -36,9 +36,7 @@ class Verifier
      */
     private $comparator;
 
-    /**
-     * @param IProvider $provider
-     */
+
     public function __construct(IProvider $provider)
     {
         $schemaFilter = new SchemaFilter();
@@ -52,11 +50,7 @@ class Verifier
         $this->comparator = new DumpComparator($converter, $sectionComparator);
     }
 
-    /**
-     * @param string $sourcePath
-     * @throws Exception
-     */
-    public function verify($sourcePath)
+    public function verify(string $sourcePath): void
     {
         $actual = $this->dumper->dump();
         $expected = $this->dumpReader->read($sourcePath);

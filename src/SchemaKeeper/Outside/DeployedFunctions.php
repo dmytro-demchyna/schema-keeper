@@ -10,24 +10,24 @@ namespace SchemaKeeper\Outside;
 class DeployedFunctions
 {
     /**
-     * @var array
+     * @var string[]
      */
     private $changed = [];
 
     /**
-     * @var array
+     * @var string[]
      */
     private $created = [];
 
     /**
-     * @var array
+     * @var string[]
      */
     private $deleted = [];
 
     /**
-     * @param array $changed
-     * @param array $created
-     * @param array $deleted
+     * @param string[] $changed
+     * @param string[] $created
+     * @param string[] $deleted
      */
     public function __construct(array $changed, array $created, array $deleted)
     {
@@ -38,27 +38,27 @@ class DeployedFunctions
 
     /**
      * List of functions that were changed in the current database, as their source code is different between saved dump and current database
-     * @return array
+     * @return string[]
      */
-    public function getChanged()
+    public function getChanged(): array
     {
         return $this->changed;
     }
 
     /**
      * List of functions that were created in the current database, as they do not exist in the saved dump
-     * @return array
+     * @return string[]
      */
-    public function getCreated()
+    public function getCreated(): array
     {
         return $this->created;
     }
 
     /**
      * List of functions that were deleted from the current database, as they do not exist in the saved dump
-     * @return array
+     * @return string[]
      */
-    public function getDeleted()
+    public function getDeleted(): array
     {
         return $this->deleted;
     }

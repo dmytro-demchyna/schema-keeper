@@ -40,24 +40,17 @@ class PSQLParameters
     private $executable = 'psql';
 
     /**
-     * @var array
+     * @var string[]
      */
     private $skippedSchemaNames = [];
 
     /**
-     * @var array
+     * @var string[]
      */
     private $skippedExtensionNames = [];
 
 
-    /**
-     * @param string $host
-     * @param int $port
-     * @param string $dbName
-     * @param string $user
-     * @param string $password
-     */
-    public function __construct($host, $port, $dbName, $user, $password)
+    public function __construct(string $host, int $port, string $dbName, string $user, string $password)
     {
         $this->host = $host;
         $this->port = $port;
@@ -66,90 +59,57 @@ class PSQLParameters
         $this->password = $password;
     }
 
-    /**
-     * @return string
-     */
-    public function getDbName()
+    public function getDbName(): string
     {
         return $this->dbName;
     }
 
-    /**
-     * @return string
-     */
-    public function getUser()
+    public function getUser(): string
     {
         return $this->user;
     }
 
-    /**
-     * @return string
-     */
-    public function getPassword()
+    public function getPassword(): string
     {
         return $this->password;
     }
 
-    /**
-     * @return string
-     */
-    public function getHost()
+    public function getHost(): string
     {
         return $this->host;
     }
 
-    /**
-     * @return int
-     */
-    public function getPort()
+    public function getPort(): int
     {
         return $this->port;
     }
 
-    /**
-     * @return string
-     */
-    public function getExecutable()
+    public function getExecutable(): string
     {
         return $this->executable;
     }
 
-    /**
-     * @param string $executable
-     */
-    public function setExecutable($executable)
+    public function setExecutable(string $executable): void
     {
         $this->executable = $executable;
     }
 
-    /**
-     * @return array
-     */
-    public function getSkippedSchemas()
+    public function getSkippedSchemas(): array
     {
         return $this->skippedSchemaNames;
     }
 
-    /**
-     * @param array $skippedSchemaNames
-     */
-    public function setSkippedSchemas(array $skippedSchemaNames)
+    public function setSkippedSchemas(array $skippedSchemaNames): void
     {
         $this->skippedSchemaNames = $skippedSchemaNames;
     }
 
-    /**
-     * @return array
-     */
-    public function getSkippedExtensions()
+    public function getSkippedExtensions(): array
     {
         return $this->skippedExtensionNames;
     }
 
-    /**
-     * @param array $skippedExtensionNames
-     */
-    public function setSkippedExtensions(array $skippedExtensionNames)
+    public function setSkippedExtensions(array $skippedExtensionNames): void
     {
         $this->skippedExtensionNames = $skippedExtensionNames;
     }

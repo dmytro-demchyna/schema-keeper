@@ -11,10 +11,10 @@ class SchemaFilter
 {
     /**
      * @param string $schemaName
-     * @param array $items
-     * @return array
+     * @param array<string, string> $items
+     * @return array<string, string>
      */
-    public function filter($schemaName, array $items)
+    public function filter(string $schemaName, array $items): array
     {
         $filteredItems = [];
         foreach ($items as $itemName => $itemContent) {

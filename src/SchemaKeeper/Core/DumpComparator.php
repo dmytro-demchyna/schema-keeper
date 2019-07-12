@@ -25,7 +25,12 @@ class DumpComparator
         $this->sectionComparator = $sectionComparator;
     }
 
-    public function compare(Dump $expectedDump, Dump $actualDump)
+    /**
+     * @param Dump $expectedDump
+     * @param Dump $actualDump
+     * @return array{expected:array,actual:array}
+     */
+    public function compare(Dump $expectedDump, Dump $actualDump): array
     {
         $diff = [
             'expected' => [],

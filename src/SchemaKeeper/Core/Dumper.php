@@ -21,20 +21,14 @@ class Dumper
      */
     private $filter;
 
-    /**
-     * @param IProvider $provider
-     * @param SchemaFilter $filter
-     */
+
     public function __construct(IProvider $provider, SchemaFilter $filter)
     {
         $this->provider = $provider;
         $this->filter = $filter;
     }
 
-    /**
-     * @return Dump
-     */
-    public function dump()
+    public function dump(): Dump
     {
         $schemas = [];
 

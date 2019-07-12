@@ -23,22 +23,14 @@ class DumpReader
      */
     private $helper;
 
-    /**
-     * @param SectionReader $sectionReader
-     * @param FilesystemHelper $helper
-     */
+
     public function __construct(SectionReader $sectionReader, FilesystemHelper $helper)
     {
         $this->sectionReader = $sectionReader;
         $this->helper = $helper;
     }
 
-    /**
-     * @param string $path
-     * @return Dump
-     * @throws \Exception
-     */
-    public function read($path)
+    public function read(string $path): Dump
     {
         $structurePath = $path.'/structure';
         $extensionsPath = $path.'/extensions';

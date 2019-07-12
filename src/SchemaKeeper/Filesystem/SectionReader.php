@@ -14,9 +14,7 @@ class SectionReader
      */
     private $helper;
 
-    /**
-     * @param FilesystemHelper $helper
-     */
+
     public function __construct(FilesystemHelper $helper)
     {
         $this->helper = $helper;
@@ -24,10 +22,10 @@ class SectionReader
 
     /**
      * @param string $sectionPath
-     * @return array
+     * @return array<string, string>
      * @throws \Exception
      */
-    public function readSection($sectionPath)
+    public function readSection(string $sectionPath): array
     {
         $list = [];
 
@@ -37,6 +35,8 @@ class SectionReader
 
         foreach ($this->helper->glob($sectionPath . '/*') as $itemPath) {
             $parts = pathinfo($itemPath);
+
+            $parts['extension'] = $parts['extension'] ?? '';
 
             if (!in_array($parts['extension'], ['txt', 'sql'])) {
                 continue;

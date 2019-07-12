@@ -15,164 +15,116 @@ class SchemaStructure
     private $schemaName;
 
     /**
-     * @var array
+     * @var array<string, string>
      */
     private $tables = [];
 
     /**
-     * @var array
+     * @var array<string, string>
      */
     private $views = [];
 
     /**
-     * @var array
+     * @var array<string, string>
      */
-    private $materializedViews;
+    private $materializedViews = [];
 
     /**
-     * @var array
+     * @var array<string, string>
      */
     private $types = [];
 
     /**
-     * @var array
+     * @var array<string, string>
      */
     private $functions = [];
 
     /**
-     * @var array
+     * @var array<string, string>
      */
     private $triggers = [];
 
     /**
-     * @var array
+     * @var array<string, string>
      */
     private $sequences = [];
 
 
-    /**
-     * @param string $schemaName
-     */
-    public function __construct($schemaName)
+    public function __construct(string $schemaName)
     {
         $this->schemaName = $schemaName;
     }
 
-    /**
-     * @return string
-     */
-    public function getSchemaName()
+    public function getSchemaName(): string
     {
         return $this->schemaName;
     }
 
-    /**
-     * @return array
-     */
-    public function getTables()
+    public function getTables(): array
     {
         return $this->tables;
     }
 
-    /**
-     * @param array $tables
-     */
     public function setTables(array $tables)
     {
         $this->tables = $tables;
     }
 
-    /**
-     * @return array
-     */
-    public function getViews()
+    public function getViews(): array
     {
         return $this->views;
     }
 
-    /**
-     * @param array $views
-     */
     public function setViews(array $views)
     {
         $this->views = $views;
     }
 
-    /**
-     * @return array
-     */
-    public function getTypes()
+    public function getTypes(): array
     {
         return $this->types;
     }
 
-    /**
-     * @return array
-     */
-    public function getMaterializedViews()
+    public function getMaterializedViews(): array
     {
         return $this->materializedViews;
     }
 
-    /**
-     * @param array $materializedViews
-     */
     public function setMaterializedViews(array $materializedViews)
     {
         $this->materializedViews = $materializedViews;
     }
 
-    /**
-     * @param array $types
-     */
     public function setTypes(array $types)
     {
         $this->types = $types;
     }
 
-    /**
-     * @return array
-     */
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return $this->functions;
     }
 
-    /**
-     * @param array $functions
-     */
     public function setFunctions(array $functions)
     {
         $this->functions = $functions;
     }
 
-    /**
-     * @return array
-     */
-    public function getTriggers()
+    public function getTriggers(): array
     {
         return $this->triggers;
     }
 
-    /**
-     * @param array $triggers
-     */
     public function setTriggers(array $triggers)
     {
         $this->triggers = $triggers;
     }
 
-    /**
-     * @return array
-     */
-    public function getSequences()
+    public function getSequences(): array
     {
         return $this->sequences;
     }
 
-    /**
-     * @param array $sequences
-     */
     public function setSequences(array $sequences)
     {
         $this->sequences = $sequences;
