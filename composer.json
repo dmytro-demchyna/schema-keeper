@@ -52,10 +52,5 @@
   },
   "bin": [
     "bin/schemakeeper"
-  ],
-  "extra": {
-    "branch-alias": {
-      "dev-master": "2.2-dev"
-    }
-  }
+  ]
 }
