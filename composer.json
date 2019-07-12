@@ -1,6 +1,6 @@
 {
   "name": "schema-keeper/schema-keeper",
-  "description": "Mapping PostgreSQL database structure to a file system",
+  "description": "Database development kit for PostgreSQL",
   "minimum-stability": "stable",
   "type": "library",
   "license": "MIT",
@@ -11,11 +11,11 @@
     "postgres",
     "plpgsql",
     "pgsql",
+    "stored procedures",
     "schema",
     "dump",
-    "sync",
-    "synchronization",
-    "deploy"
+    "deploy",
+    "sync"
   ],
   "authors": [
     {
