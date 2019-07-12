@@ -3,14 +3,5 @@
   "files": [
     "LICENSE"
   ],
-  "finder": [
-    {
-      "name": "*.php",
-      "exclude": ["Tests"],
-      "in": "vendor"
-    }
-  ],
-  "main": "bin/schemakeeper",
-  "output": "/data/schemakeeper.phar",
-  "stub": true
+  "banner": false
 }
