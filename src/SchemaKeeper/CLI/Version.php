@@ -7,9 +7,12 @@
 
 namespace SchemaKeeper\CLI;
 
+/**
+ * @internal
+ */
 class Version
 {
-    const VERSION = 'v2.2.0';
+    public const VERSION = 'v3.0-dev';
 
     public static function getVersionText(): string
     {

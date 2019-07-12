@@ -11,6 +11,9 @@ use SchemaKeeper\Core\Dump;
 use SchemaKeeper\Core\SchemaStructure;
 use SchemaKeeper\Exception\KeeperException;
 
+/**
+ * @internal
+ */
 class DumpReader
 {
     /**

@@ -7,6 +7,9 @@
 
 namespace SchemaKeeper\Exception;
 
+/**
+ * @api
+ */
 class KeeperException extends \RuntimeException
 {
 }

@@ -19,6 +19,9 @@ use SchemaKeeper\Filesystem\FilesystemHelper;
 use SchemaKeeper\Filesystem\SectionReader;
 use SchemaKeeper\Provider\IProvider;
 
+/**
+ * @internal
+ */
 class Verifier
 {
     /**

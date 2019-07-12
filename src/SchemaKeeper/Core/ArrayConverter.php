@@ -9,6 +9,9 @@ namespace SchemaKeeper\Core;
 
 use SchemaKeeper\Exception\KeeperException;
 
+/**
+ * @internal
+ */
 class ArrayConverter
 {
     /**

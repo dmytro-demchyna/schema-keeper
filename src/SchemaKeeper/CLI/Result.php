@@ -7,6 +7,9 @@
 
 namespace SchemaKeeper\CLI;
 
+/**
+ * @internal
+ */
 class Result
 {
     /**

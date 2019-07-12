@@ -9,6 +9,9 @@ namespace SchemaKeeper\CLI;
 
 use SchemaKeeper\Provider\PostgreSQL\PSQLParameters;
 
+/**
+ * @internal
+ */
 class Parsed
 {
     /**

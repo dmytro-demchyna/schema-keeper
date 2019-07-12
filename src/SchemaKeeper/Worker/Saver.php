@@ -15,6 +15,9 @@ use SchemaKeeper\Filesystem\FilesystemHelper;
 use SchemaKeeper\Filesystem\SectionWriter;
 use SchemaKeeper\Provider\IProvider;
 
+/**
+ * @internal
+ */
 class Saver
 {
     /**

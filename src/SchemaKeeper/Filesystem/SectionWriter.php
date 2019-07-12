@@ -7,6 +7,9 @@
 
 namespace SchemaKeeper\Filesystem;
 
+/**
+ * @internal
+ */
 class SectionWriter
 {
     /**

@@ -10,6 +10,9 @@ namespace SchemaKeeper\Filesystem;
 use Exception;
 use SchemaKeeper\Core\Dump;
 
+/**
+ * @internal
+ */
 class DumpWriter
 {
     /**

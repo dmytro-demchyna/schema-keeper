@@ -7,6 +7,9 @@
 
 namespace SchemaKeeper\Provider\PostgreSQL;
 
+/**
+ * @api
+ */
 class PSQLParameters
 {
     /**

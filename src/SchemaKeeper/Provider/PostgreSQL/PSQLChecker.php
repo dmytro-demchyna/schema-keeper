@@ -9,6 +9,9 @@ namespace SchemaKeeper\Provider\PostgreSQL;
 
 use SchemaKeeper\Exception\KeeperException;
 
+/**
+ * @internal
+ */
 class PSQLChecker
 {
     /**

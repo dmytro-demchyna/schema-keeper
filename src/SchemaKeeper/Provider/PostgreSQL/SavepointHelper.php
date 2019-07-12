@@ -9,6 +9,9 @@ namespace SchemaKeeper\Provider\PostgreSQL;
 
 use PDO;
 
+/**
+ * @internal
+ */
 class SavepointHelper
 {
     /**

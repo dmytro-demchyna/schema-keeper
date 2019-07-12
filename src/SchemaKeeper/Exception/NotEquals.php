@@ -7,6 +7,9 @@
 
 namespace SchemaKeeper\Exception;
 
+/**
+ * @api
+ */
 class NotEquals extends KeeperException
 {
     /**

@@ -14,6 +14,9 @@ use SchemaKeeper\Provider\PostgreSQL\PSQLClient;
 use SchemaKeeper\Provider\PostgreSQL\PSQLParameters;
 use SchemaKeeper\Provider\PostgreSQL\PSQLProvider;
 
+/**
+ * @internal
+ */
 class ProviderFactory
 {
     /**

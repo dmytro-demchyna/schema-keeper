@@ -10,6 +10,9 @@ namespace SchemaKeeper\CLI;
 use SchemaKeeper\Exception\KeeperException;
 use SchemaKeeper\Keeper;
 
+/**
+ * @internal
+ */
 class Runner
 {
     /**

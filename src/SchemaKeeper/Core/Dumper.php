@@ -9,6 +9,9 @@ namespace SchemaKeeper\Core;
 
 use SchemaKeeper\Provider\IProvider;
 
+/**
+ * @internal
+ */
 class Dumper
 {
     /**

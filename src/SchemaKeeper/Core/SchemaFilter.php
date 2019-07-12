@@ -7,6 +7,9 @@
 
 namespace SchemaKeeper\Core;
 
+/**
+ * @internal
+ */
 class SchemaFilter
 {
     /**

@@ -10,6 +10,9 @@ namespace SchemaKeeper\Filesystem;
 use Exception;
 use SchemaKeeper\Exception\KeeperException;
 
+/**
+ * @internal
+ */
 class FilesystemHelper
 {
     public function isDir(string $path): bool

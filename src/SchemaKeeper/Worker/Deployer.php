@@ -7,7 +7,6 @@
 
 namespace SchemaKeeper\Worker;
 
-use Exception;
 use SchemaKeeper\Core\ArrayConverter;
 use SchemaKeeper\Core\SectionComparator;
 use SchemaKeeper\Exception\KeeperException;
@@ -18,6 +17,9 @@ use SchemaKeeper\Filesystem\SectionReader;
 use SchemaKeeper\Outside\DeployedFunctions;
 use SchemaKeeper\Provider\IProvider;
 
+/**
+ * @internal
+ */
 class Deployer
 {
     /**

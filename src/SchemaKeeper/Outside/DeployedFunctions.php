@@ -7,6 +7,9 @@
 
 namespace SchemaKeeper\Outside;
 
+/**
+ * @api
+ */
 class DeployedFunctions
 {
     /**

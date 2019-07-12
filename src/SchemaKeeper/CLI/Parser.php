@@ -10,6 +10,9 @@ namespace SchemaKeeper\CLI;
 use SchemaKeeper\Exception\KeeperException;
 use SchemaKeeper\Provider\PostgreSQL\PSQLParameters;
 
+/**
+ * @internal
+ */
 class Parser
 {
     public function parse(array $options, array $argv): Parsed

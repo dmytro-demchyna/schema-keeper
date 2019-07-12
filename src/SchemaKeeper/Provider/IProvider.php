@@ -7,6 +7,9 @@
 
 namespace SchemaKeeper\Provider;
 
+/**
+ * @internal
+ */
 interface IProvider
 {
     /**

@@ -12,6 +12,9 @@ use PDO;
 use SchemaKeeper\Exception\KeeperException;
 use SchemaKeeper\Provider\IProvider;
 
+/**
+ * @internal
+ */
 class PSQLProvider implements IProvider
 {
     /**

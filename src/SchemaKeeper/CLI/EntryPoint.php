@@ -11,6 +11,9 @@ use PDO;
 use SchemaKeeper\Exception\KeeperException;
 use SchemaKeeper\Keeper;
 
+/**
+ * @internal
+ */
 class EntryPoint
 {
     public function run(array $options, array $argv): Result
