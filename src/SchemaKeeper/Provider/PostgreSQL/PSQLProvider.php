@@ -59,13 +59,12 @@ class PSQLProvider implements IProvider
 
     public function getTables(): array
     {
-        $sql = '
-        SELECT concat_ws(\'.\', schemaname, tablename) AS table_path
-          FROM pg_catalog.pg_tables 
-          WHERE '.$this->expandLike('schemaname', $this->skippedSchemaNames).'
-          
-          ORDER BY table_path
-         ';
+        $sql = sprintf("
+            SELECT concat_ws('.', schemaname, tablename) AS table_path
+            FROM pg_catalog.pg_tables 
+            WHERE %s
+            ORDER BY table_path
+         ", $this->expandLike('schemaname', $this->skippedSchemaNames));
 
         $stmt = $this->query($sql);
 
@@ -83,12 +82,14 @@ class PSQLProvider implements IProvider
 
     public function getViews(): array
     {
-        $stmt = $this->query('
-            SELECT (schemaname || \'.\' || viewname) AS view_path
+        $sql = sprintf("
+            SELECT (schemaname || '.' || viewname) AS view_path
             FROM pg_catalog.pg_views
-            WHERE '.$this->expandLike('schemaname', $this->skippedSchemaNames).'
+            WHERE %s
             ORDER BY view_path
-        ');
+        ", $this->expandLike('schemaname', $this->skippedSchemaNames));
+
+        $stmt = $this->query($sql);
 
         $commands = [];
         while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
@@ -103,12 +104,14 @@ class PSQLProvider implements IProvider
 
     public function getMaterializedViews(): array
     {
-        $stmt = $this->query('
-            SELECT (schemaname || \'.\' || matviewname) AS view_path
+        $sql = sprintf("
+            SELECT (schemaname || '.' || matviewname) AS view_path
             FROM pg_catalog.pg_matviews
-            WHERE '.$this->expandLike('schemaname', $this->skippedSchemaNames).'
+            WHERE %s
             ORDER BY view_path
-        ');
+        ", $this->expandLike('schemaname', $this->skippedSchemaNames));
+
+        $stmt = $this->query($sql);
 
         $commands = [];
         while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
@@ -128,14 +131,13 @@ class PSQLProvider implements IProvider
         $sql = "
             SELECT
               concat_ws('.', n.nspname, c.relname, t.tgname) as tg_path,
-              pg_get_triggerdef(t.OID, true) AS tg_def
-            FROM pg_trigger t
-            INNER JOIN pg_class c
+              pg_catalog.pg_get_triggerdef(t.OID, true) AS tg_def
+            FROM pg_catalog.pg_trigger t
+            INNER JOIN pg_catalog.pg_class c
               ON c.OID = t.tgrelid
-            INNER JOIN pg_namespace n
+            INNER JOIN pg_catalog.pg_namespace n
               ON n.OID = c.relnamespace
-            WHERE
-                t.tgisinternal = FALSE
+            WHERE t.tgisinternal = FALSE
             ORDER BY tg_path
         ";
 
@@ -155,30 +157,30 @@ class PSQLProvider implements IProvider
     {
         $actualFunctions = [];
 
-        $sql = '
+        $sql = sprintf("
             SELECT
-              concat_ws(\'.\', n.nspname, p.proname) AS pro_path,
-              ARRAY(
-                  SELECT concat_ws(\'.\', n1.nspname, pgt.typname) as typname
-                  FROM (SELECT
-                          u       AS type_oid,
-                          row_number()
-                          OVER () AS row_number
-                        FROM unnest(p.proargtypes) u) types
-                    LEFT JOIN pg_type pgt ON 
-                      pgt.OID = types.type_oid
-                  LEFT JOIN pg_namespace n1
-                    ON n1.OID = pgt.typnamespace 
-                         AND n1.nspname NOT IN (\'pg_catalog\', \'public\')
-                  ORDER BY types.row_number
-              )                                    AS arg_types,
-              pg_get_functiondef(p.oid)            AS pro_def
+            concat_ws('.', n.nspname, p.proname) AS pro_path,
+            ARRAY(
+              SELECT concat_ws('.', n1.nspname, pgt.typname) as typname
+              FROM (SELECT
+                      u       AS type_oid,
+                      row_number()
+                      OVER () AS row_number
+                    FROM unnest(p.proargtypes) u) types
+                LEFT JOIN pg_catalog.pg_type pgt ON 
+                  pgt.OID = types.type_oid
+              LEFT JOIN pg_catalog.pg_namespace n1
+                ON n1.OID = pgt.typnamespace 
+                     AND n1.nspname NOT IN ('pg_catalog', 'public')
+              ORDER BY types.row_number
+            )                                    AS arg_types,
+            pg_catalog.pg_get_functiondef(p.oid)            AS pro_def
             FROM pg_catalog.pg_namespace n
-              JOIN pg_catalog.pg_proc p
-                ON p.pronamespace = n.oid
-            WHERE '.$this->expandLike('n.nspname', $this->skippedSchemaNames).'
+            JOIN pg_catalog.pg_proc p
+            ON p.pronamespace = n.oid
+            WHERE %s
             ORDER BY pro_path
-        ';
+        ", $this->expandLike('n.nspname', $this->skippedSchemaNames));
 
         $stmt = $this->query($sql);
 
@@ -196,7 +198,7 @@ class PSQLProvider implements IProvider
     {
         $actualTypes = [];
 
-        $sql = "
+        $sql = sprintf("
             SELECT 
                    concat_ws('.', n.nspname, t.typname) AS type_path,
                    t.typbyval
@@ -208,9 +210,9 @@ class PSQLProvider implements IProvider
                    AND NOT EXISTS(SELECT 1
                                   FROM pg_catalog.pg_type el
                                   WHERE el.oid = t.typelem AND el.typarray = t.oid)
-                   AND (".$this->expandLike('n.nspname', $this->skippedSchemaNames).")
+                   AND %s
               ORDER BY type_path
-        ";
+        ", $this->expandLike('n.nspname', $this->skippedSchemaNames));
 
         $stmt = $this->query($sql);
 
@@ -234,12 +236,12 @@ class PSQLProvider implements IProvider
     {
         $actualSchemas = [];
 
-        $sql = '
+        $sql = sprintf("
             SELECT schema_name
             FROM information_schema.schemata
-            WHERE '.$this->expandLike('schema_name', $this->skippedSchemaNames).'
+            WHERE %s
             ORDER BY schema_name
-        ';
+        ", $this->expandLike('schema_name', $this->skippedSchemaNames));
 
         $stmt = $this->query($sql);
 
@@ -255,16 +257,16 @@ class PSQLProvider implements IProvider
     {
         $actualExtensions = [];
 
-        $sql = '
+        $sql = sprintf("
             SELECT
               ext.extname,
               nsp.nspname
-            FROM pg_extension ext
-              LEFT JOIN pg_namespace nsp
+            FROM pg_catalog.pg_extension ext
+              LEFT JOIN pg_catalog.pg_namespace nsp
                 ON nsp.OID = ext.extnamespace
-            WHERE '.$this->expandLike('extname', $this->skippedExtensionNames).'
+            WHERE %s
             ORDER BY extname;
-        ';
+        ", $this->expandLike('extname', $this->skippedExtensionNames));
 
         $stmt = $this->query($sql);
 
