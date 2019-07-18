@@ -171,7 +171,7 @@ class PSQLProvider implements IProvider
                   pgt.OID = types.type_oid
               LEFT JOIN pg_catalog.pg_namespace n1
                 ON n1.OID = pgt.typnamespace 
-                     AND n1.nspname NOT IN ('pg_catalog', 'public')
+                     AND n1.nspname NOT IN ('pg_catalog')
               ORDER BY types.row_number
             )                                    AS arg_types,
             pg_catalog.pg_get_functiondef(p.oid)            AS pro_def
