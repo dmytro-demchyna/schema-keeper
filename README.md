@@ -262,10 +262,6 @@ First, merge *branch1* into *develop*, then merge *develop* into *branch2*, reso
 
 ## Extra links
 
-You can find extra information about SchemaKeeper here: 
-
-- [habr](https://habr.com/ru/post/447746/) (ru)
-
 If you are not satisfied with SchemaKeeper, look at the list of another tools: https://wiki.postgresql.org/wiki/Change_management_tools_and_techniques
 
 ## Contributing
