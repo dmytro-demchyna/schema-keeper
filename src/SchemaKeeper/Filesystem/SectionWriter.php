@@ -1,32 +1,26 @@
 <?php
+
 /**
  * This file is part of the SchemaKeeper package.
- * (c) Dmytro Demchyna <dmitry.demchina@gmail.com>
+ * (c) Dmytro Demchyna <dmytro.demchyna@gmail.com>
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace SchemaKeeper\Filesystem;
 
-/**
- * @internal
- */
-class SectionWriter
+use SchemaKeeper\Dto\Section;
+
+final class SectionWriter
 {
-    /**
-     * @var FilesystemHelper
-     */
-    private $helper;
+    private FilesystemHelper $helper;
 
     public function __construct(FilesystemHelper $helper)
     {
         $this->helper = $helper;
     }
 
-    /**
-     * @param string $sectionPath
-     * @param array<string, string> $sectionContent
-     * @throws \Exception
-     */
     public function writeSection(string $sectionPath, array $sectionContent): void
     {
         if (!$sectionContent) {
@@ -38,14 +32,22 @@ class SectionWriter
         $parts = pathinfo($sectionPath);
         $sectionName = $parts['filename'];
 
+        $sqlSections = [
+            Section::FUNCTIONS,
+            Section::TRIGGERS,
+            Section::PROCEDURES,
+        ];
+
         foreach ($sectionContent as $name => $content) {
-            if (in_array($sectionName, ['functions', 'triggers'])) {
-                $name = $name . '.sql';
+            $encodedName = $this->helper->encodeName((string) $name);
+
+            if (in_array($sectionName, $sqlSections, true)) {
+                $encodedName .= '.sql';
             } else {
-                $name = $name . '.txt';
+                $encodedName .= '.txt';
             }
 
-            $this->helper->filePutContents($sectionPath . '/' . $name, $content);
+            $this->helper->filePutContents($sectionPath . '/' . $encodedName, $content);
         }
     }
 }

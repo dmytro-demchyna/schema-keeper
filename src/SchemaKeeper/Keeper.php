@@ -1,84 +1,66 @@
 <?php
+
 /**
  * This file is part of the SchemaKeeper package.
- * (c) Dmytro Demchyna <dmitry.demchina@gmail.com>
+ * (c) Dmytro Demchyna <dmytro.demchyna@gmail.com>
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace SchemaKeeper;
 
-use Exception;
-use PDO;
-use SchemaKeeper\Outside\DeployedFunctions;
-use SchemaKeeper\Provider\ProviderFactory;
-use SchemaKeeper\Worker\Deployer;
-use SchemaKeeper\Worker\Saver;
-use SchemaKeeper\Worker\Verifier;
+use SchemaKeeper\Comparator\DumpComparator;
+use SchemaKeeper\Exception\{KeeperException, NotEquals};
+use SchemaKeeper\Collector\Dumper;
+use SchemaKeeper\Filesystem\{DumpReader, DumpWriter};
 
-/**
- * @api
- */
-class Keeper
+final class Keeper
 {
-    /**
-     * @var Saver
-     */
-    private $saver;
+    private Dumper $dumper;
 
-    /**
-     * @var Deployer
-     */
-    private $deployer;
+    private DumpWriter $dumpWriter;
 
-    /**
-     * @var Verifier
-     */
-    private $verifier;
+    private DumpReader $dumpReader;
 
-    /**
-     * @param PDO $conn
-     * @param object $parameters Depends on DBMS. Only PSQLParameters supported now (PostgreSQL)
-     * @throws Exception
-     * @see \SchemaKeeper\Provider\PostgreSQL\PSQLParameters
-     */
-    public function __construct(PDO $conn, $parameters = null)
-    {
-        $factory = new ProviderFactory();
-        $provider = $factory->createProvider($conn, $parameters);
+    private DumpComparator $comparator;
 
-        $this->saver = new Saver($provider);
-        $this->deployer = new Deployer($provider);
-        $this->verifier = new Verifier($provider);
+    public function __construct(
+        Dumper $dumper,
+        DumpWriter $dumpWriter,
+        DumpReader $dumpReader,
+        DumpComparator $comparator
+    ) {
+        $this->dumper = $dumper;
+        $this->dumpWriter = $dumpWriter;
+        $this->dumpReader = $dumpReader;
+        $this->comparator = $comparator;
     }
 
-    /**
-     * Make structure dump from current database and save it in filesystem
-     * @param string $destinationPath Dump will be saved in this folder
-     * @throws Exception
-     */
     public function saveDump(string $destinationPath): void
     {
-        $this->saver->save($destinationPath);
+        $dump = $this->dumper->dump();
+
+        if (!$dump->getSchemas()) {
+            throw new KeeperException('Dump is empty: no schemas to save');
+        }
+
+        $this->dumpWriter->write($destinationPath, $dump);
     }
 
-    /**
-     * Compare current dump with dump previously saved in filesystem.
-     * @param string $dumpPath Path to previously saved dump
-     * @throws Exception
-     */
     public function verifyDump(string $dumpPath): void
     {
-        $this->verifier->verify($dumpPath);
-    }
+        $actual = $this->dumper->dump();
+        $expected = $this->dumpReader->read($dumpPath);
 
-    /**
-     * Deploy functions from dump previously saved in filesystem.
-     * @param string $dumpPath Path to previously saved dump
-     * @return DeployedFunctions
-     * @throws Exception
-     */
-    public function deployDump(string $dumpPath): DeployedFunctions
-    {
-        return $this->deployer->deploy($dumpPath);
+        $comparisonResult = $this->comparator->compare($expected, $actual);
+
+        if (!empty($comparisonResult['expected']) || !empty($comparisonResult['actual'])) {
+            throw new NotEquals(
+                'Dump and current database are not equal',
+                $comparisonResult['expected'],
+                $comparisonResult['actual'],
+            );
+        }
     }
 }

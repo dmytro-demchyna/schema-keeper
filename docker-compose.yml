@@ -1,19 +1,24 @@
-version: '3'
-
 services:
   php:
       build: ./.dev/docker/images/php
       volumes:
         - ./:/data
       depends_on:
-          - postgres
+          - postgres10
+          - postgres17
 
-  postgres:
-    image: postgres:10.7
+  postgres10:
+    image: postgres:10
     ports:
-      - "54322:5432"
-    volumes:
-      - ./.dev/docker/images/postgres/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
-      - ./.dev/docker/images/postgres/config:/etc/postgresql
+      - "54310:5432"
     environment:
       POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: schema_keeper
+
+  postgres17:
+    image: postgres:17
+    ports:
+      - "54317:5432"
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: schema_keeper

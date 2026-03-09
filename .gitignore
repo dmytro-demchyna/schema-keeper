@@ -1,5 +1,7 @@
 /composer.phar
 /box.phar
 /vendor
-/composer.lock
 /coverage.xml
+/.idea
+.phpunit.result.cache
+.php-cs-fixer.cache

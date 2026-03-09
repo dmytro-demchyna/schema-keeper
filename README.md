@@ -1,270 +1,226 @@
 # SchemaKeeper
 
+[![CI](https://github.com/dmytro-demchyna/schema-keeper/actions/workflows/ci.yml/badge.svg)](https://github.com/dmytro-demchyna/schema-keeper/actions/workflows/ci.yml)
 [![Latest Stable Version](https://img.shields.io/packagist/v/schema-keeper/schema-keeper.svg?color=blue)](https://packagist.org/packages/schema-keeper/schema-keeper)
-[![Minimum PHP Version](https://img.shields.io/packagist/php-v/schema-keeper/schema-keeper.svg?color=blue)](https://php.net/)
-[![Minimum PostgreSQL Version](https://img.shields.io/badge/postgreSQL-%3E%3D9.4-blue.svg)](https://www.postgresql.org/)
-[![Build Status](https://img.shields.io/travis/com/dmytro-demchyna/schema-keeper/master.svg)](https://travis-ci.com/dmytro-demchyna/schema-keeper)
-[![Coverage](https://img.shields.io/codecov/c/github/dmytro-demchyna/schema-keeper/master.svg)](https://codecov.io/gh/dmytro-demchyna/schema-keeper)
-[![License](https://img.shields.io/github/license/dmytro-demchyna/schema-keeper.svg)](https://github.com/dmytro-demchyna/schema-keeper/blob/master/LICENSE)
+[![Minimum PHP Version](https://img.shields.io/badge/php-%3E%3D7.4-blue.svg)](https://php.net/)
+[![Minimum PostgreSQL Version](https://img.shields.io/badge/postgreSQL-%3E%3D10-blue.svg)](https://www.postgresql.org/)
+[![License](https://img.shields.io/packagist/l/schema-keeper/schema-keeper.svg)](https://packagist.org/packages/schema-keeper/schema-keeper)
 
-Track a structure of your PostgreSQL database in a VCS using SchemaKeeper.
+**Track your PostgreSQL database structure in a version control system.**
 
-SchemaKeeper provides 3 functions:
-1. `save` &mdash; saves a database structure as separate text files to a specified directory
-1. `verify` &mdash; detects changes between an actual database structure and the saved one
-1. `deploy` &mdash; deploys stored procedures to a database from the saved structure
+SchemaKeeper saves tracked schema objects into dedicated files, so most schema changes become small, reviewable diffs:
 
-SchemaKeeper allows to use `gitflow` principles for a database development. Each branch contains its own database structure dump, and when branches are merged, dumps are merged too.
+```bash
+schemakeeper dump /path/to/dump     # dump structure to files
+schemakeeper verify /path/to/dump   # verify files against database
+```
 
-## Table of contents
-- [Installation](#installation)
-    - [Composer](#composer)
-    - [PHAR](#phar)
-    - [Docker](#docker)
-- [Basic usage](#basic-usage)
-    - [save](#save)
-    - [verify](#verify)
-    - [deploy](#deploy)
-- [Extended usage](#extended-usage)
-    - [PHPUnit](#phpunit)
-    - [Custom transaction block](#custom-transaction-block)
-- [Workflow recommendations](#workflow-recommendations)
-    - [Safe deploy to a production](#safe-deploy-to-a-production)
-    - [Conflicts resolving](#conflicts-resolving)
-- [Extra links](#extra-links)
-- [Contributing](#contributing)
+```
+/path/to/dump
+├── extensions/
+│   ├── pgcrypto.txt
+│   └── btree_gist.txt
+└── structure/
+    ├── public/
+    │   ├── tables/
+    │   │   ├── users.txt
+    │   ├── views/
+    │   │   └── active_users.txt
+    │   ├── materialized_views/
+    │   │   └── monthly_stats.txt
+    │   ├── functions/
+    │   │   └── validate_email(text).sql
+    │   ├── procedures/
+    │   │   └── refresh_cache(int4).sql
+    │   ├── triggers/
+    │   │   └── orders.audit_trigger.sql
+    │   ├── types/
+    │   │   └── order_status.txt
+    │   └── sequences/
+    │       └── orders_id_seq.txt
+    └── billing/
+        ├── tables/
+        │   └── invoices.txt
+        └── functions/
+            └── calc_tax(numeric).sql
+```
+
+SchemaKeeper is read-only &mdash; it does not replace your migration tool, it complements it.
+
+## Why not just migrations?
+
+- **Untracked changes**: A teammate runs `ALTER TABLE` directly in production. Migrations won't catch it. SchemaKeeper will.
+- **Environment drift**: Staging has an extra index, dev is missing a trigger. You only find out when something breaks. SchemaKeeper surfaces every difference.
+- **Schema review in PRs**: Migrations show *what you intended*. SchemaKeeper shows *what actually happened* &mdash; every column, constraint, and function definition. All reviewable in a normal `git diff`.
+
+## How is this different from `pg_dump -s`?
+
+`pg_dump -s` produces a single monolithic file where small changes create noisy diffs &mdash; objects shift around, unrelated sections move, and reviewers scroll through walls of text to find the one thing that actually changed.
+
+SchemaKeeper is built specifically for Git + CI:
+
+- **Focused files.** Most tracked objects are stored separately, so diffs stay small and focused. Table-local indexes, constraints, partitions, and trigger listings stay with their parent table or view.
+- **Deterministic output.** Identical database state produces identical files, so `git diff` reflects real changes, not reordering noise.
+- **CI drift detection.** `schemakeeper verify` compares the live database against the committed snapshot and prints unified diffs. Exit code `1` on mismatch.
+
+In short: `pg_dump -s` is for *recreating* schemas; SchemaKeeper is for *tracking and reviewing* them.
 
 ## Installation
 
-> If you choose the installation via Composer or PHAR, please, install [psql](https://www.postgresql.org/docs/current/app-psql.html) app on machines where SchemaKeeper will be used. A Docker build includes pre-installed [psql](https://www.postgresql.org/docs/current/app-psql.html).
+### Requirements
+
+- PHP >= 7.4
+- `ext-pdo` + `ext-pdo_pgsql`
+- PostgreSQL 10+
 
 ### Composer
 
 ```bash
-$ composer require schema-keeper/schema-keeper
+composer require --dev schema-keeper/schema-keeper
 ```
 
 ### PHAR
 
 ```bash
-$ wget https://github.com/dmytro-demchyna/schema-keeper/releases/latest/download/schemakeeper.phar
+wget https://github.com/dmytro-demchyna/schema-keeper/releases/latest/download/schemakeeper.phar
+chmod +x schemakeeper.phar
+./schemakeeper.phar --version
 ```
 
-### Docker
+> **Note:** Examples below use `schemakeeper` as the command name.
+> Replace with `vendor/bin/schemakeeper` or `./schemakeeper.phar` depending on your installation method.
+
+## Quick start
+
+**1. Dump your database**
 
 ```bash
-$ docker pull dmytrodemchyna/schema-keeper
+schemakeeper dump /path/to/dump -h localhost -p 5432 -d mydb -U postgres
 ```
 
-## Basic Usage
-
-Create a `config.php` file:
-
-```php
-<?php
-
-use SchemaKeeper\Provider\PostgreSQL\PSQLParameters;
-
-// Connection parameters
-$params = new PSQLParameters('localhost', 5432, 'dbname', 'username', 'password');
-
-// These schemas will be ignored
-$params->setSkippedSchemas(['information_schema', 'pg_%']);
-
-// These extensions will be ignored
-$params->setSkippedExtensions(['pgtap']);
-
-// The path to psql executable
-$params->setExecutable('/bin/psql');
-
-return $params;
-```
-
-Now you can use the `schemakeeper` binary. It returns exit-code `0` on success and exit-code `1` on failure.
-
-### save
+**2. Commit the result**
 
 ```bash
-$ schemakeeper -c config.php -d /project_path/db_name save
+git add /path/to/dump
+git commit -m "Add database structure dump"
 ```
 
-The command above saves a database structure to a `/project_path/db_name` directory. 
+**3. Add verification to CI**
 
-- /project_path/db_name:
-    - structure:
-        - public:
-            - functions:
-                - func1(int8).sql
-            - materialized_views:
-                - mat_view1.txt
-            - sequences:
-                - sequence1.txt
-            - tables:
-                - table1.txt
-            - triggers:
-                - trigger1.sql
-            - types:
-                - type1.txt
-            - views:
-                - view1.txt
-        - schema2:
-            - views:
-                - view2.txt
-        - ...
-    - extensions:
-        - plpgsql.txt
+Add a step to your CI pipeline that runs `verify` against the same database used for tests:
 
-Examples of conversion database structure to files:
-
-Object type         | Schema         | Name                                     | Relative file path                 | File content
---------------------|----------------|------------------------------------------|------------------------------------|---------------
-Table               | public         | table1                                   | ./public/tables/table1.txt         | A description of the table structure obtained by `\d` [meta](https://www.postgresql.org/docs/current/app-psql.html#APP-PSQL-META-COMMANDS) command
-Stored procedure    | public         | func1(param bigint)                      | ./public/functions/func1(int8).sql | A definition of the stored procedure, including a `CREATE OR REPLACE FUNCTION` block, obtained by [pg_get_functiondef](https://www.postgresql.org/docs/current/functions-info.html#FUNCTIONS-INFO-CATALOG-TABLE)
-View                | schema2        | view2                                    | ./schema2/views/view2.txt          | A description of the view structure obtained by `\d+` [meta](https://www.postgresql.org/docs/current/app-psql.html#APP-PSQL-META-COMMANDS) command
-...                 | ...            | ...                                      | ...                                | ...
-
-The file path stores information about a type, a scheme and a name of a object. This approach makes an easier navigation through the database structure, as well as code review of changes in VCS.
-
-### verify
-
-```bash
-$ schemakeeper -c config.php -d /project_path/db_name verify
+```yaml
+- name: Verify database structure
+  run: schemakeeper verify /path/to/dump -h localhost -p 5432 -d mydb -U postgres
+  env:
+    PGPASSWORD: ${{ secrets.DB_PASSWORD }}
 ```
 
-The command above compares an actual database structure with the previously saved in `/project_path/db_name` one and displays an information about changed objects.
+`verify` exits with code `1` when the database differs from the dump, failing the build automatically.
 
-If changes exists, the `verify` will returns an exit-code `1`.
+If the database requires a password, see [Password handling](docs/cli-reference.md#password-handling).
 
-An alternative way to find changes is to call the `save` again, specifying the same directory `/project_path/db_name`, and check changes in the VCS. Since objects from the database are stored in separate files, the VCS will show only changed objects. A main disadvantage of this way &mdash; a need to overwrite files.
+Prefer PHPUnit over CLI? See [PHPUnit integration](docs/phpunit-integration.md) to run verification as a test.
 
-### deploy
+## What a failed verify looks like
 
-```bash
-$ schemakeeper -c config.php -d /project_path/db_name deploy
+When the database doesn't match the committed dump, `schemakeeper verify` prints unified diffs for every difference:
+
+```diff
+--- functions/public.func_sql_simple(integer, integer)
++++ functions/public.func_sql_simple(integer, integer)
+@@ @@
+ CREATE OR REPLACE FUNCTION public.func_sql_simple(a integer, b integer)
+  RETURNS integer
+  LANGUAGE sql
++ IMMUTABLE
+ AS $function$
+-   SELECT a + b;
++   SELECT a * b;
+ $function$
+
+--- /dev/null
++++ triggers/public.test_table.notify_on_update
+@@ @@
++CREATE TRIGGER notify_on_update AFTER UPDATE ON test_table FOR EACH ROW EXECUTE FUNCTION trig_test()
+
+--- types/public.test_enum_type
++++ types/public.test_enum_type
+@@ @@
+-{enum1,enum2}
++{enum1,enum2,enum3}
 ```
 
-The command above deploys stored procedures from the `/project_path/db_name` to the actual database.
+Here the diff shows three changes: function `func_sql_simple` gained `IMMUTABLE` and its body changed from `a + b` to `a * b`, a new trigger `notify_on_update` was added to `test_table`, and enum `test_enum_type` got a new value `enum3`.
 
-You can edit a source code of stored procedures in the same way as a rest of an application source code. Modification of a stored procedure occurs by making changes to the corresponding file in the `/project_path/db_name` directory, which is automatically reflected in the VCS.
+## Dump directory structure
 
-For example, to create a new stored procedure in the `public` schema, just create a new file with a `.sql` extension in the `/project_path/db_name/structure/public/functions` directory, place a source code of the stored procedure into it, including a `CREATE OR REPLACE FUNCTION` block, then call the `deploy`. Similarly occur modifying or removal of stored procedures. Thus, the code simultaneously enters both the VCS and the database.
+See [File format reference](docs/file-formats.md) for tracked object types, file naming, and example output.
 
-The `deploy` changes parameters of a function or a return type without additional actions, while with a classical approach it would be necessary to first perform `DROP FUNCTION`, and only then `CREATE OR REPLACE FUNCTION`.
+## PHPUnit integration
 
-Unfortunately, in some situations `deploy` is not able to automatically apply changes. For example, if you try to delete a trigger function, that is used by at least one trigger. Such situations must be solved manually using migration files.
+SchemaKeeper can also run as a PHPUnit test that fails on schema drift. See [PHPUnit integration](docs/phpunit-integration.md) for setup instructions.
 
-The `deploy` transfers changes only from stored procedures. To transfer other changes, please, use migration files (for example, [doctrine/migrations](https://packagist.org/packages/doctrine/migrations)).
+## CLI reference
 
-Migrations must be applied before the `deploy` to resolve possible problem situations.
+See [CLI reference](docs/cli-reference.md) for the full list of options, filter flags, exit codes, and password handling.
 
-> The `deploy` is designed to work with stored procedures written in [PL/pgSQL](https://www.postgresql.org/docs/current/plpgsql.html). Using with other languages may be less effective or impossible.
+## Recommended workflow
 
-## Extended usage
+### Making a schema change
 
-You can inject SchemaKeeper to your own code.
+1. Write a migration
+2. Run it against your local database
+3. Run `schemakeeper dump` to capture the new state
+4. Commit migration + dump together
+5. PR reviewers see the exact structural diff in the dump files
 
-```php
-<?php
+### Resolving merge conflicts
 
-use SchemaKeeper\Keeper;
-use SchemaKeeper\Provider\PostgreSQL\PSQLParameters;
+Different objects live in separate files, so changes to different objects auto-merge without conflicts.
 
-$host = 'localhost';
-$port = 5432;
-$dbName = 'dbname';
-$user = 'username';
-$password = 'password';
+When two branches modify the **same object**:
 
-$dsn = 'pgsql:dbname=' . $dbName . ';host=' . $host.';port='.$port;
-$conn = new PDO($dsn, $user, $password, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+1. Merge the branch as usual
+2. Accept either side of each conflict (`--ours` or `--theirs`)
+3. Apply all migrations from both branches to your local database
+4. Run `schemakeeper dump`
+5. Commit the result
 
-$params = new PSQLParameters($host, $port, $dbName, $user, $password);
-$keeper = new Keeper($conn, $params);
-```
+> The choice in step 2 doesn't matter &mdash; step 4 overwrites the files with the correct state.
 
-```php
-<?php
+### When CI verify fails
 
-$keeper->saveDump('path_to_dump');
-$keeper->verifyDump('path_to_dump');
-$keeper->deployDump('path_to_dump');
-```
+A failing `verify` means the database doesn't match the committed dump.
 
-### PHPUnit
+| Cause | Fix |
+|-------|-----|
+| Forgot to dump after migration | Run `dump` and commit the updated files |
+| Untracked DDL ran directly on database | Create a migration (or revert the change), then re-dump |
+| Stale dump after merge | Re-apply migrations and re-dump (see above) |
 
-You can wrap `verifyDump` into a PHPUnit test:
+## Limitations
 
-```php
-<?php
+**Not tracked:**
+- RLS policies
+- Roles/permissions (GRANT/REVOKE)
+- Rules
+- Foreign data wrappers
+- Publications/subscriptions
+- Event triggers
+- Operators and operator classes
+- Aggregate and window functions
+- Multirange types
+- Comments (`COMMENT ON`)
 
-class SchemaTest extends \PHPUnit\Framework\TestCase
-{
-    function testOk()
-    {
-        // Initialize $keeper here...
-        
-        try {
-            $keeper->verifyDump('/path_to_dump');
-        } catch (\SchemaKeeper\Exception\NotEquals $e) {
-            $expectedFormatted = print_r($e->getExpected(), true);
-            $actualFormatted = print_r($e->getActual(), true);
+**Procedures** require PostgreSQL 11+. On older versions, the procedures section is empty.
 
-            // assertEquals will show the detailed diff between the saved dump and actual database
-            self::assertEquals($expectedFormatted, $actualFormatted);
-        }
-    }
-}
-
-```
-
-### Custom transaction block
-
-You can wrap `deployDump` into a custom transaction block:
-
-```php
-<?php
-
-// Initialize $conn and $dbParams here...
-
-$keeper = new \SchemaKeeper\Keeper($conn, $dbParams);
-
-$conn->beginTransaction();
-
-try {
-    $result = $keeper->deployDump('/path_to_dump');
-    
-    // $result->getDeleted() - these functions were deleted from the current database
-    // $result->getCreated() - these functions were created in the current database
-    // $result->getChanged() - these functions were changed in the current database
-
-    $conn->commit();
-} catch (\Exception $e) {
-    $conn->rollBack();
-}
-```
-
-## Workflow recommendations
-
-### Safe deploy to a production
-
-A dump of a database structure saved in a VCS allows you to check a production database for exact match to a required structure. This ensures that only intended changes were transferred to the production-DB by deploy.
-
-Since the PostgreSQL [DDL](https://www.postgresql.org/docs/current/ddl.html) is [transactional](https://wiki.postgresql.org/wiki/Transactional_DDL_in_PostgreSQL:_A_Competitive_Analysis), the following deployment order is recommended:
-1. Start transaction
-1. Apply all migrations in the transaction
-1. In the same transaction, perform `deployDump`
-1. Perform `verifyDump`. If there are no errors, execute `COMMIT`. If there are errors, execute `ROLLBACK`
-
-### Conflicts resolving
-A possible conflict situation: *branch1* and *branch2* are branched from *develop*. They haven't conflict with *develop*, but have conflict with each other. A goal is to merge *branch1* and *branch2* into *develop*. 
-
-First, merge *branch1* into *develop*, then merge *develop* into *branch2*, resolve conflicts in *branch2*, and then merge *branch2* into *develop*. At the stage of conflict resolution inside *branch2*, you may have to correct a migration file in *branch2* to match the final dump that contains merge results.
-
-## Extra links
-
-If you are not satisfied with SchemaKeeper, look at the list of another tools: https://wiki.postgresql.org/wiki/Change_management_tools_and_techniques
+**Cross-version formatting:** Dumps are deterministic within a PostgreSQL major version, but formatting may differ across major versions (e.g., trigger syntax, `pg_get_viewdef()` output).
 
 ## Contributing
-Any contributions are welcome.
 
-Please refer to [CONTRIBUTING.md](https://github.com/dmytro-demchyna/schema-keeper/blob/master/.github/CONTRIBUTING.md) for information on how to contribute to SchemaKeeper.
+Contributions are welcome. Please see [CONTRIBUTING.md](.github/CONTRIBUTING.md) for guidelines.
+
+## License
+
+MIT &mdash; see [LICENSE](LICENSE) for details.

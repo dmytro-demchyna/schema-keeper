@@ -4,6 +4,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.0] - 2026-03-09
+
+### Added
+- Pure PDO database access, removing dependency on external `psql` binary
+- Stored procedures support (PostgreSQL 11+)
+- Unified diff output for verification failures
+- CLI options `--url`, `--skip-schema`, `--skip-extension`, `--skip-section`, `--no-default-skip`
+- `.schema-keeper` marker file to prevent accidental directory overwrites
+- CLI options `--only-schema` and `--only-section` for inclusive filtering (mutually exclusive with their `--skip-` counterparts)
+- `KeeperFactory::createWithDefaults()` — convenience method for library users that applies default skip lists
+
+### Changed
+- Differentiated exit codes: `1` for schema diff, `2` for connection error, `3` for configuration error
+- Minimum PHP version raised from 5.6 to 7.4
+- Minimum PostgreSQL version raised from 9.4 to 10
+- CLI interface changed from config file (`-c config.php`) to connection options (`--url` or `-h`/`-p`/`-d`/`-U`/`--password`)
+- Command renamed: `save` → `dump`
+
+### Removed
+- `deploy` command
+- External `psql` binary dependency
+
 ## [2.2.0] - 2019-06-05
 
 ### Changed

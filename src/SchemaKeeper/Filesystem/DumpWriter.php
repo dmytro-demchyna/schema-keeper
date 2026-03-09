@@ -1,30 +1,25 @@
 <?php
+
 /**
  * This file is part of the SchemaKeeper package.
- * (c) Dmytro Demchyna <dmitry.demchina@gmail.com>
+ * (c) Dmytro Demchyna <dmytro.demchyna@gmail.com>
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace SchemaKeeper\Filesystem;
 
-use Exception;
-use SchemaKeeper\Core\Dump;
+use SchemaKeeper\Dto\{Dump, Section};
+use SchemaKeeper\Exception\KeeperException;
 
-/**
- * @internal
- */
-class DumpWriter
+final class DumpWriter
 {
-    /**
-     * @var SectionWriter
-     */
-    private $sectionWriter;
+    private const MARKER_FILE = '.schema-keeper';
 
-    /**
-     * @var FilesystemHelper
-     */
-    private $helper;
+    private SectionWriter $sectionWriter;
 
+    private FilesystemHelper $helper;
 
     public function __construct(SectionWriter $sectionWriter, FilesystemHelper $helper)
     {
@@ -34,27 +29,43 @@ class DumpWriter
 
     public function write(string $path, Dump $dump): void
     {
-        $structurePath = $path.'/structure';
-        $extensionsPath = $path.'/extensions';
+        $markerPath = $path . '/' . self::MARKER_FILE;
+
+        if ($this->helper->isDir($path) && !$this->helper->isDirEmpty($path)) {
+            if (!$this->helper->isFile($markerPath)) {
+                throw new KeeperException(
+                    'Directory "' . $path . '" is not empty and does not contain a '
+                    . self::MARKER_FILE . ' marker file. '
+                    . 'Aborting to prevent accidental data loss. '
+                    . 'If this is the correct directory, create an empty ' . self::MARKER_FILE . ' file in it.',
+                );
+            }
+        } else {
+            if (!$this->helper->isDir($path)) {
+                $this->helper->mkdir($path, 0775, true);
+            }
+            $this->helper->filePutContents($markerPath, '');
+        }
+
+        $structurePath = $path . '/structure';
+        $extensionsPath = $path . '/extensions';
 
         $this->helper->rmDirIfExisted($extensionsPath);
         $this->sectionWriter->writeSection($extensionsPath, $dump->getExtensions());
 
-        foreach ($dump->getSchemas() as $schemaDump) {
-            $schemaPath = $structurePath.'/'.$schemaDump->getSchemaName();
+        $this->helper->rmDirIfExisted($structurePath);
 
-            $this->helper->rmDirIfExisted($schemaPath);
+        foreach ($dump->getSchemas() as $schemaDump) {
+            $encodedSchema = $this->helper->encodeName($schemaDump->getSchemaName());
+            $schemaPath = $structurePath . '/' . $encodedSchema;
+
             $this->helper->mkdir($schemaPath, 0775, true);
 
-            $this->helper->filePutContents($schemaPath.'/.gitkeep', '');
+            $this->helper->filePutContents($schemaPath . '/.gitkeep', '');
 
-            $this->sectionWriter->writeSection($schemaPath . '/tables', $schemaDump->getTables());
-            $this->sectionWriter->writeSection($schemaPath . '/views', $schemaDump->getViews());
-            $this->sectionWriter->writeSection($schemaPath . '/materialized_views', $schemaDump->getMaterializedViews());
-            $this->sectionWriter->writeSection($schemaPath . '/types', $schemaDump->getTypes());
-            $this->sectionWriter->writeSection($schemaPath . '/functions', $schemaDump->getFunctions());
-            $this->sectionWriter->writeSection($schemaPath . '/triggers', $schemaDump->getTriggers());
-            $this->sectionWriter->writeSection($schemaPath . '/sequences', $schemaDump->getSequences());
+            foreach (Section::all() as $section) {
+                $this->sectionWriter->writeSection($schemaPath . '/' . $section, $schemaDump->getSection($section));
+            }
         }
     }
 }

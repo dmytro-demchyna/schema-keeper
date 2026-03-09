@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<ruleset name="Project Coding Standard">
+    <file>src/</file>
+    <file>bin/</file>
+    <exclude-pattern>tests/*</exclude-pattern>
+
+    <rule ref="Generic.Files.LineLength">
+        <properties>
+            <property name="lineLimit" value="120"/>
+            <property name="absoluteLineLimit" value="120"/>
+            <property name="ignoreComments" value="true"/>
+        </properties>
+    </rule>
+</ruleset>

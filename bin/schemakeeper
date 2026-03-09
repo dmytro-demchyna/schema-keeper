@@ -1,21 +1,21 @@
 #!/usr/bin/env php
 <?php
+
 /**
  * This file is part of the SchemaKeeper package.
- * (c) Dmytro Demchyna <dmitry.demchina@gmail.com>
+ * (c) Dmytro Demchyna <dmytro.demchyna@gmail.com>
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
 
-if (version_compare(PHP_VERSION, '5.6.0', '<')) {
-    fwrite(STDERR, 'SchemaKeeper requires PHP >= 5.6' . PHP_EOL);
-    exit(1);
-}
+declare(strict_types=1);
 
-foreach (['pdo', 'pdo_pgsql', 'json'] as $extension) {
-    if (!extension_loaded($extension)) {
-        fwrite(STDERR, 'SchemaKeeper requires "' . $extension . '" extension' . PHP_EOL);
-        exit(1);
-    }
+use SchemaKeeper\Cli\{ArgvParser, CredentialsFactory, DiffBuilder, EntryPoint};
+use SchemaKeeper\KeeperFactory;
+
+if (version_compare(PHP_VERSION, '7.4.0', '<')) {
+    fwrite(STDERR, 'SchemaKeeper requires PHP >= 7.4' . PHP_EOL);
+
+    exit(1);
 }
 
 $autoloadVariants = [
@@ -34,22 +34,25 @@ foreach ($autoloadVariants as $variantPath) {
 }
 
 if (!$autoloadPath) {
-    fwrite(STDERR,
+    fwrite(
+        STDERR,
         'You must set up the project dependencies:' . PHP_EOL .
         'curl -s http://getcomposer.org/installer | php' . PHP_EOL .
-        'php composer.phar install' . PHP_EOL);
+        'php composer.phar install' . PHP_EOL,
+    );
 
     exit(1);
 }
 
 require_once $autoloadPath;
 
-echo \SchemaKeeper\CLI\Version::getVersionText();
-
-$options = getopt('c:d:', ['help', 'version']);
-
-$entryPoint = new \SchemaKeeper\CLI\EntryPoint();
-$result = $entryPoint->run($options, $argv);
+$entryPoint = new EntryPoint(
+    new ArgvParser(new CredentialsFactory()),
+    new KeeperFactory(),
+    new DiffBuilder(),
+);
+$result = $entryPoint->run($argv);
 
 echo $result->getMessage() . PHP_EOL;
+
 exit($result->getStatus());

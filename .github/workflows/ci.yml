@@ -1,0 +1,46 @@
+name: CI
+
+on: [push, pull_request]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build and start containers
+        run: docker compose up -d --build
+
+      - name: Wait for PostgreSQL
+        run: |
+          for service in postgres10 postgres17; do
+            ready=false
+            for i in $(seq 1 30); do
+              if docker compose exec -T "$service" pg_isready -U postgres; then
+                ready=true
+                break
+              fi
+              echo "Waiting for $service... ($i/30)"
+              sleep 1
+            done
+            if [ "$ready" = false ]; then
+              echo "ERROR: $service did not become ready in time"
+              docker compose logs "$service"
+              exit 1
+            fi
+          done
+
+      - name: Install dependencies
+        run: ./.dev/docker/bin/composer_install.sh
+
+      - name: Code check
+        run: ./.dev/docker/bin/code_check.sh
+
+      - name: Run tests
+        run: ./.dev/docker/bin/tests_run.sh
