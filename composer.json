@@ -1,6 +1,6 @@
 {
   "name": "schema-keeper/schema-keeper",
-  "description": "Track your PostgreSQL database structure in a version control system",
+  "description": "Track PostgreSQL schema as one-file-per-object dumps. Detect drift in CI. Read-only — complements your migrations.",
   "minimum-stability": "stable",
   "type": "library",
   "license": "MIT",

@@ -8,7 +8,7 @@
 
 **Track your PostgreSQL database structure in a version control system.**
 
-SchemaKeeper saves tracked schema objects into dedicated files, so most schema changes become small, reviewable diffs:
+SchemaKeeper is a read-only tool that saves each tracked schema object as a separate file, so schema changes become small, reviewable diffs:
 
 ```bash
 schemakeeper dump /path/to/dump     # dump structure to files
@@ -45,7 +45,7 @@ schemakeeper verify /path/to/dump   # verify files against database
             └── calc_tax(numeric).sql
 ```
 
-SchemaKeeper is read-only &mdash; it does not replace your migration tool, it complements it.
+Run `verify` in CI to catch drift before it reaches production &mdash; SchemaKeeper complements your migration tool, it doesn't replace it.
 
 ## Why not just migrations?
 
