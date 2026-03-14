@@ -55,15 +55,10 @@ Run `verify` in CI to catch drift before it reaches production &mdash; SchemaKee
 
 ## How is this different from `pg_dump -s`?
 
-`pg_dump -s` produces a single monolithic file where small changes create noisy diffs &mdash; objects shift around, unrelated sections move, and reviewers scroll through walls of text to find the one thing that actually changed.
+`pg_dump -s` is for *recreating* schemas. SchemaKeeper is for *tracking and reviewing* schema changes in Git.
 
-SchemaKeeper is built specifically for Git + CI:
-
-- **Focused files.** Most tracked objects are stored separately, so diffs stay small and focused. Table-local indexes, constraints, partitions, and trigger listings stay with their parent table or view.
-- **Deterministic output.** Identical database state produces identical files, so `git diff` reflects real changes, not reordering noise.
-- **Drift detection.** `schemakeeper verify` compares a live database against the committed snapshot and prints unified diffs. Exit code `1` on mismatch.
-
-In short: `pg_dump -s` is for *recreating* schemas; SchemaKeeper is for *tracking and reviewing* them.
+- **One file per object.** `pg_dump -s` produces a single file where every change hides in the same diff. SchemaKeeper gives each object its own file, so `git status` alone shows which tables, functions, or triggers were touched.
+- **Built-in drift detection.** `schemakeeper verify` compares a live database against the committed dump and prints unified diffs.
 
 ## Installation
 
