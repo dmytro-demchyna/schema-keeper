@@ -57,7 +57,7 @@ SchemaKeeper complements your migration tool, it doesn't replace it.
 
 `pg_dump -s` is for *recreating* schemas. SchemaKeeper is for *tracking and reviewing* schema changes in Git.
 
-- **One file per object.** `pg_dump -s` produces a single file where every change hides in the same diff. SchemaKeeper gives each object its own file, so `git status` alone shows which tables, functions, or triggers were touched.
+- **One file per object.** `pg_dump -s` puts the entire schema into a single file. SchemaKeeper gives each object its own file, so changed objects show up as changed files in `git status`.
 - **Built-in drift detection.** `schemakeeper verify` compares a live database against the committed dump and prints unified diffs.
 
 ## Installation
@@ -214,7 +214,7 @@ A failing `verify` means the database doesn't match the committed dump.
 
 **Procedures** require PostgreSQL 11+. On older versions, the procedures section is empty.
 
-**Cross-version formatting:** Dumps are deterministic within a PostgreSQL major version, but formatting may differ across major versions (e.g., trigger syntax, `pg_get_viewdef()` output).
+**Cross-version formatting:** Dumps are deterministic within a PostgreSQL major version. Some formatting may change after a PostgreSQL major upgrade.
 
 ## Contributing
 
