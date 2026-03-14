@@ -159,7 +159,10 @@ When the database doesn't match the committed dump, `schemakeeper verify` prints
 +{enum1,enum2,enum3}
 ```
 
-Here the diff shows three changes: function `func_sql_simple` gained `IMMUTABLE` and its body changed from `a + b` to `a * b`, a new trigger `notify_on_update` was added to `test_table`, and enum `test_enum_type` got a new value `enum3`.
+The diff shows:
+- `func_sql_simple` gained `IMMUTABLE` and its body changed from `a + b` to `a * b`
+- `test_table` got a new trigger `notify_on_update`
+- `test_enum_type` got a new enum value `enum3`
 
 ## Dump directory structure
 
