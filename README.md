@@ -61,7 +61,7 @@ SchemaKeeper is built specifically for Git + CI:
 
 - **Focused files.** Most tracked objects are stored separately, so diffs stay small and focused. Table-local indexes, constraints, partitions, and trigger listings stay with their parent table or view.
 - **Deterministic output.** Identical database state produces identical files, so `git diff` reflects real changes, not reordering noise.
-- **CI drift detection.** `schemakeeper verify` compares the live database against the committed snapshot and prints unified diffs. Exit code `1` on mismatch.
+- **Drift detection.** `schemakeeper verify` compares a live database against the committed snapshot and prints unified diffs. Exit code `1` on mismatch.
 
 In short: `pg_dump -s` is for *recreating* schemas; SchemaKeeper is for *tracking and reviewing* them.
 
@@ -76,7 +76,7 @@ In short: `pg_dump -s` is for *recreating* schemas; SchemaKeeper is for *trackin
 ### Composer
 
 ```bash
-composer require --dev schema-keeper/schema-keeper
+composer require schema-keeper/schema-keeper
 ```
 
 ### PHAR
@@ -98,6 +98,8 @@ chmod +x schemakeeper.phar
 schemakeeper dump /path/to/dump -h localhost -p 5432 -d mydb -U postgres
 ```
 
+If the database requires a password, see [Password handling](docs/cli-reference.md#password-handling).
+
 **2. Commit the result**
 
 ```bash
@@ -107,7 +109,7 @@ git commit -m "Add database structure dump"
 
 **3. Add verification to CI**
 
-Add a step to your CI pipeline that runs `verify` against the same database used for tests:
+Add `verify` to your CI pipeline (against the test database, after applying migrations). This ensures every migration is accompanied by an up-to-date dump:
 
 ```yaml
 - name: Verify database structure
@@ -116,11 +118,17 @@ Add a step to your CI pipeline that runs `verify` against the same database used
     PGPASSWORD: ${{ secrets.DB_PASSWORD }}
 ```
 
-`verify` exits with code `1` when the database differs from the dump, failing the build automatically.
-
-If the database requires a password, see [Password handling](docs/cli-reference.md#password-handling).
-
 Prefer PHPUnit over CLI? See [PHPUnit integration](docs/phpunit-integration.md) to run verification as a test.
+
+**4. Monitor production for drift**
+
+Run `verify` against your production database on a schedule to catch untracked DDL &mdash; the `ALTER TABLE` someone ran directly without a migration:
+
+```bash
+schemakeeper verify /path/to/dump -h prod-host -p 5432 -d mydb -U postgres
+```
+
+`verify` exits with code `1` on mismatch. Set it up as a cron job or a post-deployment step on any machine with database access.
 
 ## What a failed verify looks like
 
@@ -167,14 +175,6 @@ See [CLI reference](docs/cli-reference.md) for the full list of options, filter 
 
 ## Recommended workflow
 
-### Making a schema change
-
-1. Write a migration
-2. Run it against your local database
-3. Run `schemakeeper dump` to capture the new state
-4. Commit migration + dump together
-5. PR reviewers see the exact structural diff in the dump files
-
 ### Resolving merge conflicts
 
 Different objects live in separate files, so changes to different objects auto-merge without conflicts.
@@ -189,7 +189,7 @@ When two branches modify the **same object**:
 
 > The choice in step 2 doesn't matter &mdash; step 4 overwrites the files with the correct state.
 
-### When CI verify fails
+### When verify fails
 
 A failing `verify` means the database doesn't match the committed dump.
 
@@ -198,6 +198,7 @@ A failing `verify` means the database doesn't match the committed dump.
 | Forgot to dump after migration | Run `dump` and commit the updated files |
 | Untracked DDL ran directly on database | Create a migration (or revert the change), then re-dump |
 | Stale dump after merge | Re-apply migrations and re-dump (see above) |
+| Environment-specific object | Exclude it with `--skip-schema` or `--skip-section` |
 
 ## Limitations
 
