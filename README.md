@@ -45,13 +45,13 @@ schemakeeper verify /path/to/dump   # verify files against database
             └── calc_tax(numeric).sql
 ```
 
-Run `verify` in CI to catch drift before it reaches production &mdash; SchemaKeeper complements your migration tool, it doesn't replace it.
-
 ## Why not just migrations?
 
 - **Untracked changes**: A teammate runs `ALTER TABLE` directly in production. Migrations won't catch it. SchemaKeeper will.
 - **Environment drift**: Staging has an extra index, dev is missing a trigger. You only find out when something breaks. SchemaKeeper surfaces every difference.
 - **Schema review in PRs**: Migrations show *what you intended*. SchemaKeeper shows *what actually happened* &mdash; every column, constraint, and function definition. All reviewable in a normal `git diff`.
+
+SchemaKeeper complements your migration tool, it doesn't replace it.
 
 ## How is this different from `pg_dump -s`?
 
