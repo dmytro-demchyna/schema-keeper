@@ -44,8 +44,3 @@ jobs:
 
       - name: Run tests
         run: ./.dev/docker/bin/tests_run.sh
-
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v5
-        with:
-          files: ./coverage.xml
