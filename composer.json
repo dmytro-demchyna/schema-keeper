@@ -12,7 +12,8 @@
     "schema",
     "structure",
     "dump",
-    "diff"
+    "diff",
+    "drift"
   ],
   "authors": [
     {
