@@ -1,6 +1,7 @@
 # SchemaKeeper
 
 [![CI](https://github.com/dmytro-demchyna/schema-keeper/actions/workflows/ci.yml/badge.svg)](https://github.com/dmytro-demchyna/schema-keeper/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/dmytro-demchyna/schema-keeper/branch/master/graph/badge.svg)](https://codecov.io/gh/dmytro-demchyna/schema-keeper)
 [![Latest Stable Version](https://img.shields.io/packagist/v/schema-keeper/schema-keeper.svg?color=blue)](https://packagist.org/packages/schema-keeper/schema-keeper)
 [![Minimum PHP Version](https://img.shields.io/badge/php-%3E%3D7.4-blue.svg)](https://php.net/)
 [![Minimum PostgreSQL Version](https://img.shields.io/badge/postgreSQL-%3E%3D10-blue.svg)](https://www.postgresql.org/)
