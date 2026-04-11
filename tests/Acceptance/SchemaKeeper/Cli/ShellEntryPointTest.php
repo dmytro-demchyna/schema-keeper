@@ -10,7 +10,6 @@ declare(strict_types=1);
 
 namespace SchemaKeeper\Tests\Acceptance\SchemaKeeper\Cli;
 
-use SchemaKeeper\Cli\EntryPoint;
 use SchemaKeeper\Tests\Acceptance\AcceptanceTestCase;
 use SchemaKeeper\Tests\PostgreSqlSetUpTrait;
 
@@ -39,7 +38,7 @@ class ShellEntryPointTest extends AcceptanceTestCase
         $connArgs = $this->getShellConnArgs();
         exec('/data/bin/schemakeeper ' . $connArgs . ' dump ' . escapeshellarg($this->tmpDir), $output, $status);
         $output = implode(PHP_EOL, $output);
-        self::assertEquals($this->getExpectedOutput('Success: Dump saved ' . $this->tmpDir), $output);
+        self::assertEquals('Success: Dump saved ' . $this->tmpDir, $output);
         self::assertSame(0, $status);
     }
 
@@ -48,7 +47,7 @@ class ShellEntryPointTest extends AcceptanceTestCase
         $connArgs = $this->getShellConnArgs();
         exec('/data/bin/schemakeeper ' . $connArgs . ' verify ' . escapeshellarg($this->tmpDir), $output, $status);
         $output = implode(PHP_EOL, $output);
-        self::assertEquals($this->getExpectedOutput('Failure: Dump is empty: ' . $this->tmpDir), $output);
+        self::assertEquals('Failure: Dump is empty: ' . $this->tmpDir, $output);
         self::assertSame(3, $status);
     }
 
@@ -57,7 +56,7 @@ class ShellEntryPointTest extends AcceptanceTestCase
         $connArgs = $this->getShellConnArgs();
         exec('/data/bin/schemakeeper ' . $connArgs . ' --blabla dump ' . escapeshellarg($this->tmpDir), $output, $status);
         $output = implode(PHP_EOL, $output);
-        self::assertEquals($this->getExpectedOutput('Failure: Unrecognized option: blabla'), $output);
+        self::assertEquals('Failure: Unrecognized option: blabla', $output);
         self::assertSame(3, $status);
     }
 
@@ -66,10 +65,5 @@ class ShellEntryPointTest extends AcceptanceTestCase
         $host = self::getDbHost();
 
         return '-h ' . $host . ' -p 5432 -d schema_keeper -U postgres --password postgres';
-    }
-
-    private function getExpectedOutput(string $message): string
-    {
-        return trim(EntryPoint::getVersionText()) . PHP_EOL . $message;
     }
 }

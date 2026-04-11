@@ -18,7 +18,7 @@ use SchemaKeeper\KeeperFactory;
 /** @psalm-suppress UnusedClass */
 final class EntryPoint
 {
-    public const VERSION = 'v4.0.0-dev';
+    public const VERSION = 'v4.0.0';
 
     private ArgvParser $parser;
 
@@ -38,14 +38,12 @@ final class EntryPoint
 
     public function run(array $argv): Result
     {
-        $versionText = self::getVersionText();
-
         if (in_array('--version', $argv, true)) {
-            return new Result(rtrim($versionText), 0);
+            return new Result(self::getVersionText(), 0);
         }
 
         if (in_array('--help', $argv, true) || count($argv) <= 1) {
-            return new Result($versionText . self::getUsageText(), 0);
+            return new Result(self::getVersionText() . PHP_EOL . PHP_EOL . self::getUsageText(), 0);
         }
 
         try {
@@ -74,15 +72,15 @@ final class EntryPoint
                     );
             }
 
-            return new Result($versionText . 'Success: ' . $result, 0);
+            return new Result('Success: ' . $result, 0);
         } catch (NotEquals $e) {
             $diff = $this->diffBuilder->format($e->getExpected(), $e->getActual());
 
-            return new Result($versionText . 'Failure: Dump and current database are not equal:' . PHP_EOL . $diff, 1);
+            return new Result('Failure: Dump and current database are not equal:' . PHP_EOL . $diff, 1);
         } catch (KeeperException $e) {
-            return new Result($versionText . 'Failure: ' . $e->getMessage(), 3);
+            return new Result('Failure: ' . $e->getMessage(), 3);
         } catch (PDOException $e) {
-            return new Result($versionText . 'Failure: ' . $e->getMessage(), 2);
+            return new Result('Failure: ' . $e->getMessage(), 2);
         }
     }
 
@@ -99,7 +97,7 @@ final class EntryPoint
 
     public static function getVersionText(): string
     {
-        return 'SchemaKeeper ' . self::VERSION . ' by Dmytro Demchyna and contributors.' . PHP_EOL;
+        return 'SchemaKeeper ' . self::VERSION . ' by Dmytro Demchyna and contributors.';
     }
 
     public static function getUsageText(): string

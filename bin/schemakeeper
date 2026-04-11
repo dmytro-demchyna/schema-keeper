@@ -53,6 +53,8 @@ $entryPoint = new EntryPoint(
 );
 $result = $entryPoint->run($argv);
 
-echo $result->getMessage() . PHP_EOL;
+if ($result->getMessage() !== '') {
+    echo $result->getMessage() . PHP_EOL;
+}
 
 exit($result->getStatus());

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "319adb2ec5b9a3eff24db8598eeb26b3",
+    "content-hash": "a0b6f42e8e845a9fc093cdd886af2258",
     "packages": [
         {
             "name": "sebastian/diff",

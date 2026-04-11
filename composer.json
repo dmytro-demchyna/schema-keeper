@@ -47,10 +47,5 @@
   },
   "bin": [
     "bin/schemakeeper"
-  ],
-  "extra": {
-    "branch-alias": {
-      "dev-master": "v4.0-dev"
-    }
-  }
+  ]
 }

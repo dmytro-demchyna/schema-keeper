@@ -67,58 +67,52 @@ class EntryPointTest extends PostgreSqlTestCase
 
     public function testOk(): void
     {
-        $versionText = EntryPoint::getVersionText();
-
         $result = $this->target->run(array_merge($this->baseArgs, ['dump', $this->tmpDir]));
-        self::assertEquals($versionText . 'Success: Dump saved ' . $this->tmpDir, $result->getMessage());
+        self::assertEquals('Success: Dump saved ' . $this->tmpDir, $result->getMessage());
         self::assertSame(0, $result->getStatus());
 
         $result = $this->target->run(array_merge($this->baseArgs, ['verify', $this->tmpDir]));
-        self::assertEquals($versionText . 'Success: Dump verified ' . $this->tmpDir, $result->getMessage());
+        self::assertEquals('Success: Dump verified ' . $this->tmpDir, $result->getMessage());
         self::assertSame(0, $result->getStatus());
     }
 
     public function testOkWithUrl(): void
     {
-        $versionText = EntryPoint::getVersionText();
-
         $result = $this->target->run(array_merge($this->baseUrlArgs, ['dump', $this->tmpDir]));
-        self::assertEquals($versionText . 'Success: Dump saved ' . $this->tmpDir, $result->getMessage());
+        self::assertEquals('Success: Dump saved ' . $this->tmpDir, $result->getMessage());
         self::assertSame(0, $result->getStatus());
 
         $result = $this->target->run(array_merge($this->baseUrlArgs, ['verify', $this->tmpDir]));
-        self::assertEquals($versionText . 'Success: Dump verified ' . $this->tmpDir, $result->getMessage());
+        self::assertEquals('Success: Dump verified ' . $this->tmpDir, $result->getMessage());
         self::assertSame(0, $result->getStatus());
     }
 
     public function testHelp(): void
     {
         $result = $this->target->run(['schemakeeper', '--help']);
-        self::assertEquals(EntryPoint::getVersionText() . EntryPoint::getUsageText(), $result->getMessage());
+        self::assertEquals(EntryPoint::getVersionText() . PHP_EOL . PHP_EOL . EntryPoint::getUsageText(), $result->getMessage());
         self::assertSame(0, $result->getStatus());
     }
 
     public function testNoArgs(): void
     {
         $result = $this->target->run(['schemakeeper']);
-        self::assertEquals(EntryPoint::getVersionText() . EntryPoint::getUsageText(), $result->getMessage());
+        self::assertEquals(EntryPoint::getVersionText() . PHP_EOL . PHP_EOL . EntryPoint::getUsageText(), $result->getMessage());
         self::assertSame(0, $result->getStatus());
     }
 
     public function testVersion(): void
     {
         $result = $this->target->run(['schemakeeper', '--version']);
-        self::assertSame(rtrim(EntryPoint::getVersionText()), $result->getMessage());
+        self::assertSame(EntryPoint::getVersionText(), $result->getMessage());
         self::assertSame(0, $result->getStatus());
     }
 
     public function testMissingRequiredOption(): void
     {
-        $versionText = EntryPoint::getVersionText();
-
         $result = $this->target->run(['schemakeeper', 'dump', $this->tmpDir]);
         self::assertEquals(
-            $versionText . 'Failure: No connection parameters specified. Use -h, -p, -d, -U or --url',
+            'Failure: No connection parameters specified. Use -h, -p, -d, -U or --url',
             $result->getMessage(),
         );
         self::assertSame(3, $result->getStatus());
@@ -126,11 +120,9 @@ class EntryPointTest extends PostgreSqlTestCase
 
     public function testUnrecognizedCommand(): void
     {
-        $versionText = EntryPoint::getVersionText();
-
         $result = $this->target->run(array_merge($this->baseArgs, ['blabla', $this->tmpDir]));
         self::assertEquals(
-            $versionText . 'Failure: Unrecognized command: blabla. Available commands: dump, verify',
+            'Failure: Unrecognized command: blabla. Available commands: dump, verify',
             $result->getMessage(),
         );
         self::assertSame(3, $result->getStatus());
@@ -138,21 +130,17 @@ class EntryPointTest extends PostgreSqlTestCase
 
     public function testUnrecognizedOption(): void
     {
-        $versionText = EntryPoint::getVersionText();
-
         $result = $this->target->run([
             'schemakeeper', '--blabla',
             '-h', self::getDbHost(), '-p', '5432', '-d', 'schema_keeper', '-U', 'postgres', '--password', 'postgres',
             'dump', '/tmp/test',
         ]);
-        self::assertEquals($versionText . 'Failure: Unrecognized option: blabla', $result->getMessage());
+        self::assertEquals('Failure: Unrecognized option: blabla', $result->getMessage());
         self::assertSame(3, $result->getStatus());
     }
 
     public function testConnectionFailure(): void
     {
-        $versionText = EntryPoint::getVersionText();
-
         $result = $this->target->run([
             'schemakeeper',
             '--url', 'postgresql://postgres:postgres@postgres10:9999/nonexistent',
@@ -160,20 +148,18 @@ class EntryPointTest extends PostgreSqlTestCase
         ]);
 
         self::assertSame(2, $result->getStatus());
-        self::assertStringStartsWith($versionText . 'Failure: ', $result->getMessage());
+        self::assertStringStartsWith('Failure: ', $result->getMessage());
     }
 
     public function testVerifyDiff(): void
     {
-        $versionText = EntryPoint::getVersionText();
-
         $this->target->run(array_merge($this->baseArgs, ['dump', $this->tmpDir]));
         $this->helper->rmDirIfExisted($this->tmpDir . '/structure/public/triggers');
 
         $result = $this->target->run(array_merge($this->baseArgs, ['verify', $this->tmpDir]));
 
         self::assertSame(1, $result->getStatus());
-        self::assertStringStartsWith($versionText . 'Failure: Dump and current database are not equal:', $result->getMessage());
+        self::assertStringStartsWith('Failure: Dump and current database are not equal:', $result->getMessage());
         self::assertStringContainsString('+++ triggers/public.test_table.test_trigger', $result->getMessage());
     }
 }
