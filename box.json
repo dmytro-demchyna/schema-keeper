@@ -11,6 +11,6 @@
     }
   ],
   "main": "bin/schemakeeper",
-  "output": "/data/schemakeeper.phar",
+  "output": "schemakeeper.phar",
   "stub": true
 }

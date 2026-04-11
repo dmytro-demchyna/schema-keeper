@@ -1,0 +1,45 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '7.4'
+          extensions: pdo, pdo_pgsql
+          ini-values: phar.readonly=0
+          tools: composer:v2
+
+      - name: Install dependencies
+        run: composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Download Box
+        run: |
+          curl -fSL -o box.phar https://github.com/box-project/box/releases/download/3.16.0/box.phar
+          chmod +x box.phar
+
+      - name: Build PHAR
+        run: php box.phar compile -c box.json
+
+      - name: Verify PHAR
+        run: php schemakeeper.phar --version
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: schemakeeper.phar
+          generate_release_notes: true

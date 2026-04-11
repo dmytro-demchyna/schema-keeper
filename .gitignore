@@ -1,5 +1,6 @@
 /composer.phar
 /box.phar
+/schemakeeper.phar
 /vendor
 /coverage.xml
 /.idea
