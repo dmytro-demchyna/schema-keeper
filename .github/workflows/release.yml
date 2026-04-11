@@ -14,10 +14,10 @@ jobs:
     timeout-minutes: 10
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
 
       - name: Set up PHP
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@728c6c6b8cf02c2e48117716a91ee48313958a19 # v2
         with:
           php-version: '7.4'
           extensions: pdo, pdo_pgsql
@@ -30,16 +30,26 @@ jobs:
       - name: Download Box
         run: |
           curl -fSL -o box.phar https://github.com/box-project/box/releases/download/3.16.0/box.phar
+          echo "f508e28f309d7e95a319bdcd5f13dcfbb18eb91cb7a6cac9b69bc7799d78bdf9  box.phar" | sha256sum -c
           chmod +x box.phar
 
       - name: Build PHAR
         run: php box.phar compile -c box.json
 
-      - name: Verify PHAR
-        run: php schemakeeper.phar --version
+      - name: Verify version matches tag
+        run: |
+          PHAR_VERSION=$(php schemakeeper.phar --version)
+          echo "PHAR reports: $PHAR_VERSION"
+          echo "Git tag: $GITHUB_REF_NAME"
+          echo "$PHAR_VERSION" | grep -qF "$GITHUB_REF_NAME"
+
+      - name: Smoke test
+        run: |
+          php schemakeeper.phar --help | grep -q "Available commands"
+          rc=0; php schemakeeper.phar dump /tmp/test || rc=$?; test "$rc" -eq 3
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@153bb8e04406b158c6c84fc1615b65b24149a1fe # v2.6.1
         with:
           files: schemakeeper.phar
           generate_release_notes: true
