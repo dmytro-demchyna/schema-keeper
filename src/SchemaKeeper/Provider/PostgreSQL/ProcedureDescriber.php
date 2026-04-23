@@ -53,7 +53,7 @@ final class ProcedureDescriber implements IDescriber
             WHERE ' . $schemaFilter . '
               AND p.prokind = \'p\'
               AND ' . $extensionFilter . '
-            ORDER BY pro_path
+            ORDER BY pro_path, arg_types
         ';
 
         $stmt = $this->conn->query($sql);

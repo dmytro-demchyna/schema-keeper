@@ -57,7 +57,7 @@ final class FunctionDescriber implements IDescriber
             WHERE ' . $schemaFilter . '
               AND ' . $functionFilter . '
               AND ' . $extensionFilter . '
-            ORDER BY pro_path
+            ORDER BY pro_path, arg_types
         ';
 
         $stmt = $this->conn->query($sql);
