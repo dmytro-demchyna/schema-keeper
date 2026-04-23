@@ -116,4 +116,22 @@ class SectionComparatorTest extends UnitTestCase
 
         self::assertEquals($expected, $actual);
     }
+
+    public function testMixedAddRemoveChangeInSameSection(): void
+    {
+        $result = $this->target->compareSection(
+            'tables',
+            ['users' => 'old_def', 'removed' => 'removed_def'],
+            ['users' => 'new_def', 'added' => 'added_def'],
+        );
+
+        self::assertEquals(
+            ['tables' => ['users' => 'old_def', 'removed' => 'removed_def']],
+            $result['expected'],
+        );
+        self::assertEquals(
+            ['tables' => ['users' => 'new_def', 'added' => 'added_def']],
+            $result['actual'],
+        );
+    }
 }

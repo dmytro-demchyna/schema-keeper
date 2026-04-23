@@ -106,6 +106,34 @@ class DumpComparatorTest extends UnitTestCase
         self::assertEquals(['tables' => ['public.users' => 'new_def']], $result['actual']);
     }
 
+    public function testMixedAddRemoveChangeInSameSection(): void
+    {
+        $dump1 = new Dump(
+            [new SchemaDump('public', [
+                Section::TABLES => ['users' => 'old_def', 'removed' => 'removed_def'],
+            ])],
+            [],
+        );
+
+        $dump2 = new Dump(
+            [new SchemaDump('public', [
+                Section::TABLES => ['users' => 'new_def', 'added' => 'added_def'],
+            ])],
+            [],
+        );
+
+        $result = $this->target->compare($dump1, $dump2);
+
+        self::assertEquals(
+            ['tables' => ['public.users' => 'old_def', 'public.removed' => 'removed_def']],
+            $result['expected'],
+        );
+        self::assertEquals(
+            ['tables' => ['public.users' => 'new_def', 'public.added' => 'added_def']],
+            $result['actual'],
+        );
+    }
+
     public function testSchemaMismatch(): void
     {
         $dump1 = new Dump(

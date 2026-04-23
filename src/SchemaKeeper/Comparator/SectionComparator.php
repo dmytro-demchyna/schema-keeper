@@ -18,32 +18,37 @@ final class SectionComparator
             return [];
         }
 
-        $result = $this->doCompare($sectionName, $expectedSection, $actualSection);
-        $resultInverted = $this->doCompare($sectionName, $actualSection, $expectedSection);
+        $expectedDiff = [];
+        $actualDiff = [];
 
-        $result['expected'] = array_merge($result['expected'], $resultInverted['actual']);
-        $result['actual'] = array_merge($result['actual'], $resultInverted['expected']);
+        foreach (array_keys($expectedSection + $actualSection) as $itemName) {
+            $inExpected = array_key_exists($itemName, $expectedSection);
+            $inActual = array_key_exists($itemName, $actualSection);
 
-        return $result;
-    }
+            if ($inExpected && $inActual) {
+                if ($expectedSection[$itemName] === $actualSection[$itemName]) {
+                    continue;
+                }
+                $expectedDiff[$itemName] = $expectedSection[$itemName];
+                $actualDiff[$itemName] = $actualSection[$itemName];
+            } elseif ($inExpected) {
+                $expectedDiff[$itemName] = $expectedSection[$itemName];
+            } else {
+                $actualDiff[$itemName] = $actualSection[$itemName];
+            }
+        }
 
-    private function doCompare(string $sectionName, array $expectedSection, array $actualSection): array
-    {
         $result = [
             'expected' => [],
             'actual' => [],
         ];
 
-        foreach ($expectedSection as $expectedItemName => $expectedItemContent) {
-            if (array_key_exists($expectedItemName, $actualSection)) {
-                if ($expectedItemContent === $actualSection[$expectedItemName]) {
-                    continue;
-                }
-                $result['expected'][$sectionName][$expectedItemName] = $expectedItemContent;
-                $result['actual'][$sectionName][$expectedItemName] = $actualSection[$expectedItemName];
-            } else {
-                $result['expected'][$sectionName][$expectedItemName] = $expectedItemContent;
-            }
+        if ($expectedDiff !== []) {
+            $result['expected'][$sectionName] = $expectedDiff;
+        }
+
+        if ($actualDiff !== []) {
+            $result['actual'][$sectionName] = $actualDiff;
         }
 
         return $result;

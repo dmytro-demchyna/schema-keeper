@@ -18,7 +18,7 @@ use SchemaKeeper\KeeperFactory;
 /** @psalm-suppress UnusedClass */
 final class EntryPoint
 {
-    public const VERSION = 'v4.0.0';
+    public const VERSION = 'v4.0.1';
 
     private ArgvParser $parser;
 
